@@ -35,6 +35,7 @@ public class SceneLogic : MonoBehaviour
             {
                 GameObject newSlot = Instantiate(slotPrefab, new Vector3(0,0,0), new Quaternion(0,0,0,0), panel.transform);
                 jokeBlocks.Add(newSlot);
+                newSlot.GetComponent<SlotScript>().index = jokeBlocks.Count - 1;
             }
             else
             {
@@ -52,18 +53,29 @@ public class SceneLogic : MonoBehaviour
         for(int i = 0; i < jokeBlocks.Count; i++)
         {
             GameObject block = jokeBlocks[i];
+            Vector3 destination;
             if (i == 0)
             {
-                block.GetComponent<RectTransform>().anchoredPosition = new Vector2(70, 120);
+                block.GetComponent<SegmentScript>().destination = new Vector3(130, 380, 0);
             }
             else
             {
-                RectTransform previousBlockPos = jokeBlocks[i - 1].GetComponent<RectTransform>();
-                block.GetComponent<RectTransform>().anchoredPosition = new Vector2(previousBlockPos.anchoredPosition.x + previousBlockPos.sizeDelta.x + 30, previousBlockPos.anchoredPosition.y);
+                Vector3 previousBlockPos = jokeBlocks[i - 1].GetComponent<SegmentScript>().destination;
 
-                if(block.GetComponent<RectTransform>().anchoredPosition.x + block.GetComponent<RectTransform>().sizeDelta.x > 1700)
+                destination = new Vector3(previousBlockPos.x + jokeBlocks[i - 1].GetComponent<RectTransform>().sizeDelta.x + 30, previousBlockPos.y, 0);
+
+                block.GetComponent<SegmentScript>().destination = destination;
+
+                if (destination.x + block.GetComponent<RectTransform>().sizeDelta.x > 1700)
                 {
-                    block.GetComponent<RectTransform>().anchoredPosition = new Vector2(120, block.GetComponent<RectTransform>().anchoredPosition.y - 100);
+                    destination = new Vector3(120, destination.y - 100);
+                    block.GetComponent<SegmentScript>().destination = destination;
+                }
+
+                if(block.GetComponent<SlotScript>() != null && block.GetComponent<SlotScript>().attachedBlock != null)
+                {
+                    block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().destination = destination;
+                    block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
                 }
             }
         }

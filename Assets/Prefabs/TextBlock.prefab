@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1044163590051233386}
   - component: {fileID: 5597669572922976005}
   - component: {fileID: 4783730840633182930}
+  - component: {fileID: 4126126711100043528}
   m_Layer: 5
   m_Name: TextBlock
   m_TagString: Untagged
@@ -149,3 +150,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HorizontalFit: 2
   m_VerticalFit: 0
+--- !u!114 &4126126711100043528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6902222883371329490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c9f091c0dec9d04db5ad19821b73e20, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  destination: {x: 0, y: 0, z: 0}

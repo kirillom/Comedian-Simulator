@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -12,6 +13,7 @@ using static UnityEngine.GraphicsBuffer;
 public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 {
+    public GameObject attachedSlot;
     public SceneLogic sceneLogic;
     public Vector3 origin;
     public TMP_Text text;
@@ -69,9 +71,19 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             if (Input.GetKeyUp(KeyCode.Mouse0))
             {
-                if(collidedSlots.Count == 1)
+                if(collidedSlots.Count > 0)
                 {
-                    destination = collidedSlots[0].transform.position;
+                    if(collidedSlots.Count > 1)
+                    {
+                        collidedSlots = collidedSlots.OrderBy(o => Vector3.Distance(transform.position, o.transform.position)).ToList();
+                    }
+                    if (attachedSlot != collidedSlots[0] && attachedSlot != null)
+                    {
+                        attachedSlot.GetComponent<SlotScript>().ResetSlot();
+                    }
+
+                    OccupySlot(collidedSlots[0]);
+                    
                 }
                 isDragging = false;
                 MoveToDestination();
@@ -89,6 +101,19 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             
         }
         //Debug.Log(getAngle(destination, transform.position));
+    }
+
+    public void OccupySlot(GameObject slot)
+    {
+        if (slot.GetComponent<SlotScript>().attachedBlock != null && attachedSlot != null && slot.GetComponent<SlotScript>().attachedBlock != gameObject)
+        {
+            slot.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().OccupySlot(attachedSlot);
+        }
+
+        attachedSlot = slot;
+
+        destination = slot.transform.position;
+        slot.GetComponent<SlotScript>().SetContent(gameObject);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -121,8 +146,8 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         
         if((Math.Sign(velocity.x) != Math.Sign(velocityDelta.x) || Math.Sign(velocity.y) != Math.Sign(velocityDelta.y)) && Math.Sign(velocity.x) != 0 && Math.Sign(velocity.y) != 0)
         {
-            velocityDelta.x = Mathf.Clamp(Math.Abs(velocityDelta.x) * 5 * speed, -10, Math.Abs(velocity.x)) * Math.Sign(velocityDelta.x);
-            velocityDelta.y = Mathf.Clamp(Math.Abs(velocityDelta.y) * 5 * speed, -10, Math.Abs(velocity.y)) * Math.Sign(velocityDelta.y);
+            velocityDelta.x = Mathf.Clamp(Math.Abs(velocityDelta.x) * 7 * speed, -10, Math.Abs(velocity.x)) * Math.Sign(velocityDelta.x);
+            velocityDelta.y = Mathf.Clamp(Math.Abs(velocityDelta.y) * 7 * speed, -10, Math.Abs(velocity.y)) * Math.Sign(velocityDelta.y);
         }
         else
         {
