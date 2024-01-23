@@ -66,7 +66,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             {
                 if(collidedSlots.Count == 1)
                 {
-                    destination = collidedSlots[0].GetComponent<RectTransform>().anchoredPosition + new Vector2(0,-280);
+                    destination = collidedSlots[0].GetComponent<RectTransform>().anchoredPosition;
                 }
                 isDragging = false;
                 MoveToDestination();
