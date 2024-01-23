@@ -8,7 +8,7 @@ public class SceneLogic : MonoBehaviour
 {
     public int fps;
     public List<GameObject> jokeBlocks;
-    public Canvas ui;
+    public Image panel;
     public GameObject wordPrefab;
     public GameObject slotPrefab;
     // Start is called before the first frame update
@@ -33,12 +33,12 @@ public class SceneLogic : MonoBehaviour
         {
             if(word == "\0")
             {
-                GameObject newSlot = Instantiate(slotPrefab, new Vector3(0,0,0), new Quaternion(0,0,0,0), ui.transform);
+                GameObject newSlot = Instantiate(slotPrefab, new Vector3(0,0,0), new Quaternion(0,0,0,0), panel.transform);
                 jokeBlocks.Add(newSlot);
             }
             else
             {
-                GameObject newWord = Instantiate(wordPrefab, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0), ui.transform);
+                GameObject newWord = Instantiate(wordPrefab, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0), panel.transform);
                 newWord.GetComponent<TMP_Text>().text = word;
                 jokeBlocks.Add(newWord);
             }
@@ -54,14 +54,14 @@ public class SceneLogic : MonoBehaviour
             GameObject block = jokeBlocks[i];
             if (i == 0)
             {
-                block.GetComponent<RectTransform>().anchoredPosition = new Vector2(120, -150);
+                block.GetComponent<RectTransform>().anchoredPosition = new Vector2(70, 120);
             }
             else
             {
                 RectTransform previousBlockPos = jokeBlocks[i - 1].GetComponent<RectTransform>();
                 block.GetComponent<RectTransform>().anchoredPosition = new Vector2(previousBlockPos.anchoredPosition.x + previousBlockPos.sizeDelta.x + 30, previousBlockPos.anchoredPosition.y);
 
-                if(block.GetComponent<RectTransform>().anchoredPosition.x + block.GetComponent<RectTransform>().sizeDelta.x > 1800)
+                if(block.GetComponent<RectTransform>().anchoredPosition.x + block.GetComponent<RectTransform>().sizeDelta.x > 1700)
                 {
                     block.GetComponent<RectTransform>().anchoredPosition = new Vector2(120, block.GetComponent<RectTransform>().anchoredPosition.y - 100);
                 }

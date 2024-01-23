@@ -12,35 +12,40 @@ using static UnityEngine.GraphicsBuffer;
 public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 {
-    public Vector2 origin;
+    public SceneLogic sceneLogic;
+    public Vector3 origin;
     public TMP_Text text;
     public Image box;
     private List<GameObject> collidedSlots = new List<GameObject>();
     private bool isMouseOver = false;
     private bool isDragging = false;
     public bool isMoving = false;
-    public Vector2 position;
-    public Vector2 destination;
-    public Vector2 velocity;
+    public Vector3 globalPosition;
+    public Vector3 destination;
+    public Vector3 velocity;
+    public float width;
     public float speed;
     public float distance;
     // Start is called before the first frame update
     void Start()
     {
+        sceneLogic = GameObject.FindGameObjectWithTag("Scene Logic").GetComponent<SceneLogic>();
         Invoke("DelayedStart", 0.01f);
     }
 
     void DelayedStart()
     {
-        box.GetComponent<RectTransform>().sizeDelta = new Vector2(text.GetComponent<RectTransform>().sizeDelta.x + 100, 80);
+        width = text.GetComponent<RectTransform>().sizeDelta.x + 100;
+        box.GetComponent<RectTransform>().sizeDelta = new Vector2(width, 80);
         GetComponent<BoxCollider2D>().size = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x, 80);
+        GetComponent<BoxCollider2D>().offset = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x / 2, 0);
     }
 
     // Update is called once per frame
     void Update()
     {
-        position = GetComponent<RectTransform>().anchoredPosition;
-        //destination = origin.GetComponent<RectTransform>().anchoredPosition;
+        globalPosition = transform.position;
+        //destination = origin.transform.position;
 
         if (isMouseOver)
         {
@@ -48,16 +53,16 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             {
                 isDragging = true;
             }
-            if(position.y < origin.y + 10 && !isDragging && !isMoving)
+            if(transform.position.y < origin.y + 10 && !isDragging && !isMoving)
             {
-                GetComponent<RectTransform>().anchoredPosition += new Vector2(0, 1);
+                transform.position += new Vector3(0, 1, 0);
             }
         }
         else
         {
-            if (position.y > origin.y && !isDragging && !isMoving)
+            if (transform.position.y > origin.y && !isDragging && !isMoving)
             {
-                GetComponent<RectTransform>().anchoredPosition -= new Vector2(0, 1);
+                transform.position -= new Vector3(0, 1, 0);
             }
         }
         if(isDragging)
@@ -66,7 +71,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             {
                 if(collidedSlots.Count == 1)
                 {
-                    destination = collidedSlots[0].GetComponent<RectTransform>().anchoredPosition;
+                    destination = collidedSlots[0].transform.position;
                 }
                 isDragging = false;
                 MoveToDestination();
@@ -83,7 +88,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             
         }
-        //Debug.Log(getAngle(destination, GetComponent<RectTransform>().anchoredPosition));
+        //Debug.Log(getAngle(destination, transform.position));
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -98,21 +103,21 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         //destination = Input.mousePosition;
         isMoving = false;
-        GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(GetComponent<RectTransform>().anchoredPosition, new Vector2(Input.mousePosition.x - 960, Input.mousePosition.y - 540), 0.2f);
+        transform.position = Vector2.Lerp(transform.position, new Vector2(Input.mousePosition.x - (width / 2), Input.mousePosition.y), 0.2f);
     }
 
     public void MoveToDestination()
     {
-        float angle = Mathf.Atan2(destination.y - position.y, destination.x - position.x);
-        distance = Vector2.Distance(GetComponent<RectTransform>().anchoredPosition, destination);
+        float angle = Mathf.Atan2(destination.y - transform.position.y, destination.x - transform.position.x);
+        distance = Vector2.Distance(transform.position, destination);
         speed = distance / 300f;
         velocity = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * distance / 30f;
         isMoving = true;
     }
     private void BlockMovement()
     {
-        float angle = Mathf.Atan2(destination.y - position.y, destination.x - position.x);
-        Vector2 velocityDelta = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+        float angle = Mathf.Atan2(destination.y - transform.position.y, destination.x - transform.position.x);
+        Vector3 velocityDelta = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0);
         
         if((Math.Sign(velocity.x) != Math.Sign(velocityDelta.x) || Math.Sign(velocity.y) != Math.Sign(velocityDelta.y)) && Math.Sign(velocity.x) != 0 && Math.Sign(velocity.y) != 0)
         {
@@ -126,12 +131,12 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         velocity += velocityDelta;
 
-        GetComponent<RectTransform>().anchoredPosition += velocity;
+        transform.position += velocity;
 
-        if(Vector2.Distance(GetComponent<RectTransform>().anchoredPosition, destination) < speed + 0.2f)
+        if(Vector2.Distance(transform.position, destination) < speed + 0.2f)
         {
             origin = destination;
-            GetComponent<RectTransform>().anchoredPosition = origin;
+            transform.position = origin;
             isMoving = false;
         }
     }
