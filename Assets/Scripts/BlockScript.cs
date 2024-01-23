@@ -97,6 +97,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     private void blockDrag()
     {
         //destination = Input.mousePosition;
+        isMoving = false;
         GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(GetComponent<RectTransform>().anchoredPosition, new Vector2(Input.mousePosition.x - 960, Input.mousePosition.y - 540), 0.2f);
     }
 
