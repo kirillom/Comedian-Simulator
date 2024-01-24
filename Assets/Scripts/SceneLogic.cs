@@ -8,13 +8,18 @@ public class SceneLogic : MonoBehaviour
 {
     public int fps;
     public List<GameObject> jokeBlocks;
+    public List<GameObject> wordBlocks;
     public Image panel;
+    public Image wordsPanel;
     public GameObject wordPrefab;
     public GameObject slotPrefab;
+    public GameObject blockPrefab;
+    public GameObject blockOriginPrefab;
     // Start is called before the first frame update
     void Start()
     {
         NewJoke();
+        CreateWordPool();
     }
 
     // Update is called once per frame
@@ -45,10 +50,10 @@ public class SceneLogic : MonoBehaviour
             }
         }
 
-        Invoke("SortBlocks", 0.01f);
+        Invoke("SortJokeBlocks", 0.01f);
     }
 
-    public void SortBlocks()
+    public void SortJokeBlocks()
     {
         for(int i = 0; i < jokeBlocks.Count; i++)
         {
@@ -78,6 +83,45 @@ public class SceneLogic : MonoBehaviour
                     block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
                 }
             }
+        }
+    }
+
+    public void CreateWordPool()
+    {
+        string[] words = { "dog", "stupid man", "burning house", "depression" };
+
+        foreach (string word in words)
+        {
+            GameObject newWord = Instantiate(blockOriginPrefab, new Vector3(0, 0, 0), new Quaternion(0, 0, 0, 0), wordsPanel.transform);
+            newWord.transform.GetChild(1).GetComponent<TMP_Text>().text = word;
+            wordBlocks.Add(newWord);
+        }
+
+        Invoke("SortWordBlocks", 0.02f);
+    }
+
+    public void SortWordBlocks()
+    {
+        for (int i = 0; i < wordBlocks.Count; i++)
+        {
+            GameObject origin = wordBlocks[i];
+            if (i == 0)
+            {
+                origin.transform.position = new Vector3(130, 150, 0);
+            }
+            else
+            {
+                GameObject previousorigin = wordBlocks[i - 1];
+
+                origin.transform.position = new Vector3(previousorigin.transform.position.x + previousorigin.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x + 30, previousorigin.transform.position.y, 0);
+
+                if (origin.transform.position.x + origin.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x > 1700)
+                {
+                    origin.transform.position = new Vector3(120, origin.transform.position.y - 100);
+                }
+            }
+            GameObject block = Instantiate(blockPrefab, origin.transform.position, new Quaternion(0, 0, 0, 0), wordsPanel.transform);
+            block.transform.GetChild(1).GetComponent<TMP_Text>().text = origin.transform.GetChild(1).GetComponent<TMP_Text>().text;
         }
     }
 }

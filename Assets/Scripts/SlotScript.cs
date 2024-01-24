@@ -37,7 +37,7 @@ public class SlotScript : MonoBehaviour
         attachedBlock = block;
         GetComponent<RectTransform>().sizeDelta = GetComponent<BoxCollider2D>().size = new Vector2(block.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x, 80);
         GetComponent<BoxCollider2D>().offset = new Vector2(GetComponent<RectTransform>().sizeDelta.x / 2, 0);
-        sceneLogic.SortBlocks();
+        sceneLogic.SortJokeBlocks();
     }
 
     public void ResetSlot()
@@ -45,6 +45,6 @@ public class SlotScript : MonoBehaviour
         attachedBlock = null;
         GetComponent<RectTransform>().sizeDelta = GetComponent<BoxCollider2D>().size = new Vector2(110,80);
         GetComponent<BoxCollider2D>().offset = new Vector2(55, 0);
-        sceneLogic.SortBlocks();
+        sceneLogic.SortJokeBlocks();
     }
 }

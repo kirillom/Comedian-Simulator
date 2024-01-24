@@ -13,6 +13,8 @@ using static UnityEngine.GraphicsBuffer;
 public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 {
+    //should make a new block when the one is placed to slot
+    //how can block return to wordsPanel?
     public GameObject attachedSlot;
     public SceneLogic sceneLogic;
     public Vector3 origin;
@@ -32,6 +34,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     void Start()
     {
         sceneLogic = GameObject.FindGameObjectWithTag("Scene Logic").GetComponent<SceneLogic>();
+        origin = destination = transform.position;
         Invoke("DelayedStart", 0.01f);
     }
 
@@ -128,6 +131,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         //destination = Input.mousePosition;
         isMoving = false;
+        transform.SetAsLastSibling();
         transform.position = Vector2.Lerp(transform.position, new Vector2(Input.mousePosition.x - (width / 2), Input.mousePosition.y), 0.2f);
     }
 
