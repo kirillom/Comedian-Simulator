@@ -13,10 +13,11 @@ using static UnityEngine.GraphicsBuffer;
 public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 {
-    //should make a new block when the one is placed to slot
-    //how can block return to wordsPanel?
+    public Animator animator;
     public GameObject attachedSlot;
+    public GameObject baseSlot;
     public SceneLogic sceneLogic;
+    public Image colorOverlay;
     public Vector3 origin;
     public TMP_Text text;
     public Image box;
@@ -30,51 +31,73 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public float width;
     public float speed;
     public float distance;
+    private bool isCollidedBlock;
     // Start is called before the first frame update
     void Start()
     {
+        animator.SetTrigger("Appear");
         sceneLogic = GameObject.FindGameObjectWithTag("Scene Logic").GetComponent<SceneLogic>();
         origin = destination = transform.position;
-        Invoke("DelayedStart", 0.01f);
+        StartCoroutine(DelayedStart());
     }
 
-    void DelayedStart()
+    IEnumerator DelayedStart()
     {
+        yield return new WaitForEndOfFrame();
         width = text.GetComponent<RectTransform>().sizeDelta.x + 100;
         box.GetComponent<RectTransform>().sizeDelta = new Vector2(width, 80);
         GetComponent<BoxCollider2D>().size = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x, 80);
         GetComponent<BoxCollider2D>().offset = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x / 2, 0);
     }
 
+    void baseSlotVisible()
+    {
+        baseSlot.transform.GetChild(0).GetComponent<Image>().color = new Color(1,1,1,1);
+        baseSlot.transform.GetChild(1).GetComponent<TMP_Text>().color = new Color(0.7f, 0.7f, 0.7f, 1);
+        animator.enabled = false;
+        transform.localScale = new Vector3(1,1,1);
+    }
+
     // Update is called once per frame
     void Update()
     {
         globalPosition = transform.position;
-        //destination = origin.transform.position;
 
         if (isMouseOver)
         {
             if(Input.GetKeyDown(KeyCode.Mouse0))
             {
                 isDragging = true;
+                transform.SetParent(transform.parent.parent.parent, true);
+                if (attachedSlot != null)
+                {
+                    sceneLogic.wordsPanelAnimator.SetBool("ShowTrashBin", true);
+                }
             }
-            if(transform.position.y < origin.y + 10 && !isDragging && !isMoving)
-            {
-                transform.position += new Vector3(0, 1, 0);
-            }
+            //if(transform.position.y < origin.y + 10 && !isDragging && !isMoving)
+            //{
+            //    transform.position += new Vector3(0, 1, 0);
+            //}
         }
-        else
-        {
-            if (transform.position.y > origin.y && !isDragging && !isMoving)
-            {
-                transform.position -= new Vector3(0, 1, 0);
-            }
-        }
+        //else
+        //{
+        //    if (transform.position.y > origin.y && !isDragging && !isMoving)
+        //    {
+        //        transform.position -= new Vector3(0, 1, 0);
+        //    }
+        //}
         if(isDragging)
         {
             if (Input.GetKeyUp(KeyCode.Mouse0))
             {
-                if(collidedSlots.Count > 0)
+                if (Input.mousePosition.y < 350 && attachedSlot != null)
+                {
+                    attachedSlot.GetComponent<SlotScript>().ResetSlot();
+                    Destroy(gameObject);
+                }
+                sceneLogic.wordsPanelAnimator.SetBool("ShowTrashBin", false);
+                sceneLogic.wordsPanelAnimator.SetBool("Hovering", false);
+                if (collidedSlots.Count > 0)
                 {
                     if(collidedSlots.Count > 1)
                     {
@@ -89,9 +112,19 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                     
                 }
                 isDragging = false;
+                transform.SetParent(transform.parent.GetChild(1).GetChild(0), true);
                 MoveToDestination();
             }
             else blockDrag();
+
+            if(Input.mousePosition.y < 350)
+            {
+                sceneLogic.wordsPanelAnimator.SetBool("Hovering", true);
+            }
+            else
+            {
+                sceneLogic.wordsPanelAnimator.SetBool("Hovering", false);
+            }
         }
 
         if(isMoving)
@@ -103,20 +136,34 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             
         }
-        //Debug.Log(getAngle(destination, transform.position));
     }
 
     public void OccupySlot(GameObject slot)
     {
-        if (slot.GetComponent<SlotScript>().attachedBlock != null && attachedSlot != null && slot.GetComponent<SlotScript>().attachedBlock != gameObject)
+        if(attachedSlot == null)
         {
-            slot.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().OccupySlot(attachedSlot);
+            GameObject newBlock = Instantiate(gameObject, baseSlot.transform.position, new Quaternion(0, 0, 0, 0), transform.parent.GetChild(1).GetChild(0));
+            newBlock.GetComponent<Animator>().enabled = true;
+
+            if (slot.GetComponent<SlotScript>().attachedBlock != null)
+            {
+                Destroy(slot.GetComponent<SlotScript>().attachedBlock);
+            }
+        }
+        else
+        {
+            if (slot.GetComponent<SlotScript>().attachedBlock != null && slot.GetComponent<SlotScript>().attachedBlock != gameObject)
+            {
+                slot.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().OccupySlot(attachedSlot);
+            }
         }
 
         attachedSlot = slot;
 
-        destination = slot.transform.position;
+        collidedSlots.Remove(attachedSlot);
+
         slot.GetComponent<SlotScript>().SetContent(gameObject);
+        sceneLogic.SortJokeBlocks();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -132,15 +179,15 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         //destination = Input.mousePosition;
         isMoving = false;
         transform.SetAsLastSibling();
-        transform.position = Vector2.Lerp(transform.position, new Vector2(Input.mousePosition.x - (width / 2), Input.mousePosition.y), 0.2f);
+        transform.position = Vector3.Lerp(transform.position, new Vector3(Input.mousePosition.x - (width / 2), Input.mousePosition.y, 0), 0.2f);
     }
 
     public void MoveToDestination()
     {
         float angle = Mathf.Atan2(destination.y - transform.position.y, destination.x - transform.position.x);
-        distance = Vector2.Distance(transform.position, destination);
+        distance = Vector3.Distance(transform.position, destination);
         speed = distance / 300f;
-        velocity = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * distance / 30f;
+        velocity = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle)) * distance / 30f;
         isMoving = true;
     }
     private void BlockMovement()
@@ -162,7 +209,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         transform.position += velocity;
 
-        if(Vector2.Distance(transform.position, destination) < speed + 0.2f)
+        if(Vector3.Distance(transform.position, destination) < speed + 0.2f)
         {
             origin = destination;
             transform.position = origin;
@@ -172,10 +219,43 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        collidedSlots.Add(collision.gameObject);
+        if (collision.gameObject.tag == "Slot" && collision.gameObject != attachedSlot)
+        {
+            collidedSlots.Add(collision.gameObject);
+        }
+        else if(collision.gameObject.GetComponent<BlockScript>() != null)
+        {
+            if (collision.gameObject.GetComponent<BlockScript>().isDragging)
+            {
+                isCollidedBlock = true;
+                StartCoroutine(opacityMinus());
+            }
+        }
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
         collidedSlots.Remove(collision.gameObject);
+        if(isCollidedBlock)
+        {
+            isCollidedBlock = false;
+            StartCoroutine(opacityPlus());
+        }
+    }
+
+    IEnumerator opacityPlus()
+    {
+        while(box.color.a < 1f && !isCollidedBlock)
+        {
+            yield return new WaitForEndOfFrame();
+            box.color += new Color(0, 0, 0, 0.1f);
+        }
+    }
+    IEnumerator opacityMinus()
+    {
+        while (box.color.a > 0f && isCollidedBlock)
+        {
+            yield return new WaitForEndOfFrame();
+            box.color -= new Color(0, 0, 0, 0.1f);
+        }
     }
 }

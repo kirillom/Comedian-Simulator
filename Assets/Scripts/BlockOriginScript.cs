@@ -12,15 +12,16 @@ public class BlockOriginScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Invoke("DelayedStart", 0.01f);
+        StartCoroutine(DelayedStart());
     }
 
-    void DelayedStart()
+    IEnumerator DelayedStart()
     {
+        yield return new WaitForEndOfFrame();
         width = text.GetComponent<RectTransform>().sizeDelta.x + 100;
         box.GetComponent<RectTransform>().sizeDelta = new Vector2(width, 80);
-        GetComponent<BoxCollider2D>().size = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x, 80);
-        GetComponent<BoxCollider2D>().offset = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x / 2, 0);
+        //GetComponent<BoxCollider2D>().size = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x, 80);
+        //GetComponent<BoxCollider2D>().offset = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x / 2, 0);
     }
     // Update is called once per frame
     void Update()

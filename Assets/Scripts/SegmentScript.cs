@@ -14,9 +14,9 @@ public class SegmentScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (transform.position != destination)
+        if (transform.localPosition != destination)
         {
-            transform.position = Vector3.Lerp(transform.position, destination, 0.2f);
+            transform.localPosition = Vector2.Lerp(transform.localPosition, destination, 0.2f);
         }
     }
 }
