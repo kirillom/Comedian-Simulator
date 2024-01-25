@@ -8,9 +8,12 @@ public class SceneLogic : MonoBehaviour
 {
     public int fps;
     public List<GameObject> jokeBlocks;
-    public List<GameObject> wordBlocks;
-    public Image panel;
-    public GameObject wordsContainer;
+    public List<GameObject> situationalWordBlocks;
+    public List<GameObject> generalWordBlocks;
+    public GameObject jokePanel;
+    public GameObject mainInterface;
+    public GameObject situationalWordsContainer;
+    public GameObject generalWordsContainer;
     public GameObject wordPrefab;
     public GameObject slotPrefab;
     public GameObject blockPrefab;
@@ -30,7 +33,10 @@ public class SceneLogic : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.R))
         {
             NewJoke();
-            CreateWordPool();
+            string[] situationalWords = { "dog", "stupid man", "burning house", "depression", "moon", "parents", "study", "learn", "play" };
+            string[] generalWords = { "me", "we", "I", "us", "they", "is", "can", "do", "make" };
+            CreateWordPool(situationalWordsContainer, ref situationalWordBlocks, situationalWords);
+            CreateWordPool(generalWordsContainer, ref generalWordBlocks, generalWords);
         }
 
         if(isDraggingBlock)
@@ -49,16 +55,13 @@ public class SceneLogic : MonoBehaviour
         {
             if(word == "\0")
             {
-                GameObject newSlot = Instantiate(slotPrefab, new Vector3(-100,-100,0), new Quaternion(0,0,0,0), panel.transform);
-                Debug.Log(newSlot.transform.position);
-                Debug.Log(newSlot.transform.localPosition);
-                Debug.Log(newSlot.transform.TransformVector(newSlot.transform.localPosition));
+                GameObject newSlot = Instantiate(slotPrefab, new Vector3(-100,-100,0), new Quaternion(0,0,0,0), jokePanel.transform);
                 jokeBlocks.Add(newSlot);
                 newSlot.GetComponent<SlotScript>().index = jokeBlocks.Count - 1;
             }
             else
             {
-                GameObject newWord = Instantiate(wordPrefab, new Vector3(-100, -100, 0), new Quaternion(0, 0, 0, 0), panel.transform);
+                GameObject newWord = Instantiate(wordPrefab, new Vector3(-100, -100, 0), new Quaternion(0, 0, 0, 0), jokePanel.transform);
                 newWord.GetComponent<TMP_Text>().text = word;
                 jokeBlocks.Add(newWord);
             }
@@ -100,29 +103,27 @@ public class SceneLogic : MonoBehaviour
         }
     }
 
-    public void CreateWordPool()
+    public void CreateWordPool(GameObject container, ref List<GameObject> wordBlocks, string[] words)
     {
-        string[] words = { "dog", "stupid man", "burning house", "depression" };
-
         foreach (string word in words)
         {
-            GameObject newWord = Instantiate(blockOriginPrefab, new Vector3(-100, -100, 0), new Quaternion(0, 0, 0, 0), wordsContainer.transform);
+            GameObject newWord = Instantiate(blockOriginPrefab, new Vector3(-100, -100, 0), new Quaternion(0, 0, 0, 0), container.transform);
             newWord.transform.GetChild(1).GetComponent<TMP_Text>().text = word;
             wordBlocks.Add(newWord);
         }
 
-        StartCoroutine(SortWordBlocks());
+        StartCoroutine(SortWordBlocks(container, wordBlocks));
     }
 
-    public IEnumerator SortWordBlocks()
+    public IEnumerator SortWordBlocks(GameObject container, List<GameObject> wordBlocks)
     {
         for (int i = 0; i < wordBlocks.Count; i++)
         {
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.1f);
             GameObject origin = wordBlocks[i];
             if (i == 0)
             {
-                origin.transform.position = new Vector3(130, 150, 0);
+                origin.transform.position = new Vector3(130, 230, 0);
             }
             else
             {
@@ -132,12 +133,17 @@ public class SceneLogic : MonoBehaviour
 
                 if (origin.transform.position.x + origin.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x > 1700)
                 {
-                    origin.transform.position = new Vector3(120, origin.transform.position.y - 100);
+                    origin.transform.position = new Vector3(130, origin.transform.position.y - 100);
                 }
             }
-            GameObject block = Instantiate(blockPrefab, origin.transform.position, new Quaternion(0, 0, 0, 0), wordsContainer.transform);
+            GameObject block = Instantiate(blockPrefab, origin.transform.position, new Quaternion(0, 0, 0, 0), container.transform);
+            BlockScript blockScript = block.GetComponent<BlockScript>();
+            blockScript.container = container;
+            blockScript.jokePanel = jokePanel;
+            blockScript.mainInterface = mainInterface;
+            blockScript.sceneLogic = gameObject.GetComponent<SceneLogic>();
             block.transform.GetChild(1).GetComponent<TMP_Text>().text = origin.transform.GetChild(1).GetComponent<TMP_Text>().text;
-            block.GetComponent<BlockScript>().baseSlot = origin;
+            blockScript.baseSlot = origin;
         }
     }
 }

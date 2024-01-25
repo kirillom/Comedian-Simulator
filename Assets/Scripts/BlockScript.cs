@@ -32,11 +32,13 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public float speed;
     public float distance;
     private bool isCollidedBlock;
+    public GameObject container;
+    public GameObject jokePanel;
+    public GameObject mainInterface;
     // Start is called before the first frame update
     void Start()
     {
         animator.SetTrigger("Appear");
-        sceneLogic = GameObject.FindGameObjectWithTag("Scene Logic").GetComponent<SceneLogic>();
         origin = destination = transform.position;
         StartCoroutine(DelayedStart());
     }
@@ -68,11 +70,11 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             if(Input.GetKeyDown(KeyCode.Mouse0))
             {
                 isDragging = true;
-                transform.SetParent(transform.parent.parent.parent, true);
                 if (attachedSlot != null)
                 {
                     sceneLogic.wordsPanelAnimator.SetBool("ShowTrashBin", true);
                 }
+                transform.SetParent(mainInterface.transform, true);
             }
             //if(transform.position.y < origin.y + 10 && !isDragging && !isMoving)
             //{
@@ -111,8 +113,11 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                     OccupySlot(collidedSlots[0]);
                     
                 }
+                else
+                {
+                    transform.SetParent(container.transform, true);
+                }
                 isDragging = false;
-                transform.SetParent(transform.parent.GetChild(1).GetChild(0), true);
                 MoveToDestination();
             }
             else blockDrag();
@@ -142,7 +147,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         if(attachedSlot == null)
         {
-            GameObject newBlock = Instantiate(gameObject, baseSlot.transform.position, new Quaternion(0, 0, 0, 0), transform.parent.GetChild(1).GetChild(0));
+            GameObject newBlock = Instantiate(gameObject, baseSlot.transform.position, new Quaternion(0, 0, 0, 0), container.transform);
             newBlock.GetComponent<Animator>().enabled = true;
 
             if (slot.GetComponent<SlotScript>().attachedBlock != null)
@@ -154,6 +159,8 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             if (slot.GetComponent<SlotScript>().attachedBlock != null && slot.GetComponent<SlotScript>().attachedBlock != gameObject)
             {
+                slot.GetComponent<SlotScript>().attachedBlock.transform.GetChild(0).GetComponent<Image>().color += new Color(0, 0, 0, 1);
+                slot.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().color += new Color(0, 0, 0, 1);
                 slot.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().OccupySlot(attachedSlot);
             }
         }
@@ -161,6 +168,9 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         attachedSlot = slot;
 
         collidedSlots.Remove(attachedSlot);
+
+        container = jokePanel;
+        transform.SetParent(container.transform);
 
         slot.GetComponent<SlotScript>().SetContent(gameObject);
         sceneLogic.SortJokeBlocks();
@@ -225,7 +235,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         }
         else if(collision.gameObject.GetComponent<BlockScript>() != null)
         {
-            if (collision.gameObject.GetComponent<BlockScript>().isDragging)
+            if (collision.gameObject.GetComponent<BlockScript>().isDragging && attachedSlot != null)
             {
                 isCollidedBlock = true;
                 StartCoroutine(opacityMinus());
@@ -248,14 +258,16 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             yield return new WaitForEndOfFrame();
             box.color += new Color(0, 0, 0, 0.1f);
+            text.color += new Color(0, 0, 0, 0.1f);
         }
     }
     IEnumerator opacityMinus()
     {
-        while (box.color.a > 0f && isCollidedBlock)
+        while (box.color.a > 0.3f && isCollidedBlock)
         {
             yield return new WaitForEndOfFrame();
             box.color -= new Color(0, 0, 0, 0.1f);
+            text.color -= new Color(0, 0, 0, 0.1f);
         }
     }
 }
