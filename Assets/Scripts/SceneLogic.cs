@@ -19,6 +19,8 @@ public class SceneLogic : MonoBehaviour
     public GameObject blockPrefab;
     public GameObject blockOriginPrefab;
     public Animator wordsPanelAnimator;
+    public string[] audiences = { "teenagers", "teachers", "bikers", "" };
+    //public const Dictionary<string, string[]> themedNouns;
 
     public bool isDraggingBlock = false;
     // Start is called before the first frame update
