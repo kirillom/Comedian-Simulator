@@ -173,7 +173,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         transform.SetParent(container.transform);
 
         slot.GetComponent<SlotScript>().SetContent(gameObject);
-        sceneLogic.SortJokeBlocks();
+        StartCoroutine(sceneLogic.SortJokeBlocks());
     }
 
     public void OnPointerEnter(PointerEventData eventData)

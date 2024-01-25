@@ -11,6 +11,7 @@ public class InterfaceScript : MonoBehaviour
     public string currentPool = "situational";
     public bool activePoolAnim = false;
     public bool swapAnimPlaying = false;
+    public SceneLogic sceneLogic;
     public Animator animator;
     // Start is called before the first frame update
     void Start()
@@ -47,12 +48,21 @@ public class InterfaceScript : MonoBehaviour
         }
     }
 
-    public void AnimStart()
+    public void PoolAnimStart()
     {
         swapAnimPlaying = true;
     }
-    public void AnimEnd()
+    public void PoolAnimEnd()
     {
         swapAnimPlaying = false;
+    }
+
+    public void PanelAppearAnimEnd()
+    {
+        sceneLogic.CreateWordPool();
+    }
+    public void PanelDisappearAnimEnd()
+    {
+
     }
 }

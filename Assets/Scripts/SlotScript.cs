@@ -58,7 +58,7 @@ public class SlotScript : MonoBehaviour
     {
         attachedBlock = block;
         slot.color = new Color(1, 1, 1);
-        GetComponent<RectTransform>().sizeDelta = GetComponent<BoxCollider2D>().size = new Vector2(block.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x, 80);
+        GetComponent<RectTransform>().sizeDelta = GetComponent<BoxCollider2D>().size = new Vector2(block.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x, 40);
         GetComponent<BoxCollider2D>().offset = new Vector2(GetComponent<RectTransform>().sizeDelta.x / 2, 0);
     }
 
@@ -66,8 +66,8 @@ public class SlotScript : MonoBehaviour
     {
         attachedBlock = null;
         slot.color = new Color(0.9f, 0.9f, 0.9f);
-        GetComponent<RectTransform>().sizeDelta = GetComponent<BoxCollider2D>().size = new Vector2(110,80);
+        GetComponent<RectTransform>().sizeDelta = GetComponent<BoxCollider2D>().size = new Vector2(110,40);
         GetComponent<BoxCollider2D>().offset = new Vector2(55, 0);
-        sceneLogic.SortJokeBlocks();
+        StartCoroutine(sceneLogic.SortJokeBlocks());
     }
 }

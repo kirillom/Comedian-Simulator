@@ -19,6 +19,7 @@ public class SceneLogic : MonoBehaviour
     public GameObject blockPrefab;
     public GameObject blockOriginPrefab;
     public Animator wordsPanelAnimator;
+    public Animator interfaceAnimator;
     public string[] audiences = { "teenagers", "teachers", "bikers", "" };
     //public const Dictionary<string, string[]> themedNouns;
 
@@ -34,11 +35,8 @@ public class SceneLogic : MonoBehaviour
         Application.targetFrameRate = fps;
         if(Input.GetKeyDown(KeyCode.R))
         {
-            NewJoke();
-            string[] situationalWords = { "dog", "stupid man", "burning house", "depression", "moon", "parents", "study", "learn", "play" };
-            string[] generalWords = { "me", "we", "I", "us", "they", "is", "can", "do", "make" };
-            CreateWordPool(situationalWordsContainer, ref situationalWordBlocks, situationalWords);
-            CreateWordPool(generalWordsContainer, ref generalWordBlocks, generalWords);
+            string joke = "Why did the \0 \0 ? Because \0 \0 ! Also some more text to test.";
+            NewJoke(joke);
         }
 
         if(isDraggingBlock)
@@ -47,11 +45,20 @@ public class SceneLogic : MonoBehaviour
         }
     }
 
-    public void NewJoke()
+    public void CreateWordPool()
+    {
+        string[] situationalWords = { "dog", "stupid man", "burning house", "depression", "moon", "parents", "study", "learn", "play" };
+        string[] generalWords = { "me", "we", "I", "us", "they", "is", "can", "do", "make" };
+        InstantiateBlockSlots(situationalWordsContainer, ref situationalWordBlocks, situationalWords);
+        InstantiateBlockSlots(generalWordsContainer, ref generalWordBlocks, generalWords);
+    }
+
+    public void NewJoke(string joke)
     {
         //string joke = "What did the \0 say to the \0 ? \0 !";
-        string joke = "Why did the \0 \0 ? Because \0 \0 ! Also some more text to test.";
         string[] separatedWords = joke.Split(" ");
+
+        interfaceAnimator.SetBool("ActivePanel", true);
 
         foreach (string word in separatedWords)
         {
@@ -69,34 +76,45 @@ public class SceneLogic : MonoBehaviour
             }
         }
 
-        Invoke("SortJokeBlocks", 0.1f);
+        StartCoroutine(SortJokeBlocks());
     }
 
-    public void SortJokeBlocks()
+    public IEnumerator SortJokeBlocks()
     {
+        yield return new WaitForEndOfFrame();
         for(int i = 0; i < jokeBlocks.Count; i++)
         {
             GameObject block = jokeBlocks[i];
             Vector3 destination;
             if (i == 0)
             {
-                block.GetComponent<SegmentScript>().destination = new Vector2(-830, 120);
+                block.GetComponent<SegmentScript>().destination = new Vector2(-830, -50);
             }
             else
             {
                 Vector2 previousBlockPos = jokeBlocks[i - 1].GetComponent<SegmentScript>().destination;
 
-                destination = new Vector2(previousBlockPos.x + jokeBlocks[i - 1].GetComponent<RectTransform>().sizeDelta.x + 30, previousBlockPos.y);
-
-                block.GetComponent<SegmentScript>().destination = destination;
+                destination = new Vector2(previousBlockPos.x + jokeBlocks[i - 1].GetComponent<RectTransform>().sizeDelta.x + 15, previousBlockPos.y);
 
                 if (destination.x + block.GetComponent<RectTransform>().sizeDelta.x > 830)
                 {
-                    destination = new Vector2(-830, destination.y - 100);
-                    block.GetComponent<SegmentScript>().destination = destination;
+                    for(int j = 0; j < i; j++)
+                    {
+                        Vector3 oldDestination = jokeBlocks[j].GetComponent<SegmentScript>().destination;
+                        oldDestination = new Vector2(oldDestination.x, oldDestination.y + 50);
+                        jokeBlocks[j].GetComponent<SegmentScript>().destination = oldDestination;
+                        if (jokeBlocks[j].GetComponent<SlotScript>() != null && jokeBlocks[j].GetComponent<SlotScript>().attachedBlock != null)
+                        {
+                            jokeBlocks[j].GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().destination = jokeBlocks[j].transform.TransformPoint(Vector3.zero) + (oldDestination - jokeBlocks[j].transform.localPosition);
+                            jokeBlocks[j].GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
+                        }
+                    }
+                    destination = new Vector2(-830, destination.y);
                 }
 
-                if(block.GetComponent<SlotScript>() != null && block.GetComponent<SlotScript>().attachedBlock != null)
+                block.GetComponent<SegmentScript>().destination = destination;
+
+                if (block.GetComponent<SlotScript>() != null && block.GetComponent<SlotScript>().attachedBlock != null)
                 {
                     block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().destination = block.transform.TransformPoint(Vector3.zero) + (destination - block.transform.localPosition);
                     block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
@@ -105,7 +123,7 @@ public class SceneLogic : MonoBehaviour
         }
     }
 
-    public void CreateWordPool(GameObject container, ref List<GameObject> wordBlocks, string[] words)
+    public void InstantiateBlockSlots(GameObject container, ref List<GameObject> wordBlocks, string[] words)
     {
         foreach (string word in words)
         {
