@@ -47,7 +47,7 @@ public class SceneLogic : MonoBehaviour
 
     public void CreateWordPool()
     {
-        string[] situationalWords = { "dog", "stupid man", "burning house", "depression", "moon", "parents", "study", "learn", "play" };
+        string[] situationalWords = { "dog", "stupid man", "burning house", "depression", "moon", "parents", "study", "learn", "play", "dog", "stupid man", "burning house", "depression", "moon", "parents", "study", "learn", "play" };
         string[] generalWords = { "me", "we", "I", "us", "they", "is", "can", "do", "make" };
         InstantiateBlockSlots(situationalWordsContainer, ref situationalWordBlocks, situationalWords);
         InstantiateBlockSlots(generalWordsContainer, ref generalWordBlocks, generalWords);
@@ -88,7 +88,7 @@ public class SceneLogic : MonoBehaviour
             Vector3 destination;
             if (i == 0)
             {
-                block.GetComponent<SegmentScript>().destination = new Vector2(-830, -50);
+                block.GetComponent<SegmentScript>().destination = new Vector2(-830, 70);
             }
             else
             {
@@ -101,7 +101,7 @@ public class SceneLogic : MonoBehaviour
                     for(int j = 0; j < i; j++)
                     {
                         Vector3 oldDestination = jokeBlocks[j].GetComponent<SegmentScript>().destination;
-                        oldDestination = new Vector2(oldDestination.x, oldDestination.y + 50);
+                        oldDestination = new Vector2(oldDestination.x, oldDestination.y + 65);
                         jokeBlocks[j].GetComponent<SegmentScript>().destination = oldDestination;
                         if (jokeBlocks[j].GetComponent<SlotScript>() != null && jokeBlocks[j].GetComponent<SlotScript>().attachedBlock != null)
                         {
@@ -143,17 +143,17 @@ public class SceneLogic : MonoBehaviour
             GameObject origin = wordBlocks[i];
             if (i == 0)
             {
-                origin.transform.position = new Vector3(130, 230, 0);
+                origin.transform.position = new Vector3(110, 280, 0);
             }
             else
             {
                 GameObject previousOrigin = wordBlocks[i - 1];
 
-                origin.transform.position = new Vector3(previousOrigin.transform.position.x + previousOrigin.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x + 30, previousOrigin.transform.position.y, 0);
+                origin.transform.position = new Vector3(previousOrigin.transform.position.x + previousOrigin.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x + 25, previousOrigin.transform.position.y, 0);
 
                 if (origin.transform.position.x + origin.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x > 1700)
                 {
-                    origin.transform.position = new Vector3(130, origin.transform.position.y - 100);
+                    origin.transform.position = new Vector3(110, origin.transform.position.y - 80);
                 }
             }
             GameObject block = Instantiate(blockPrefab, origin.transform.position, new Quaternion(0, 0, 0, 0), container.transform);

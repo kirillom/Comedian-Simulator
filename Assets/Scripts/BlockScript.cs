@@ -21,6 +21,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public Vector3 origin;
     public TMP_Text text;
     public Image box;
+    public Image fill;
     private List<GameObject> collidedSlots = new List<GameObject>();
     private bool isMouseOver = false;
     private bool isDragging = false;
@@ -46,16 +47,16 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     IEnumerator DelayedStart()
     {
         yield return new WaitForEndOfFrame();
-        width = text.GetComponent<RectTransform>().sizeDelta.x + 100;
-        box.GetComponent<RectTransform>().sizeDelta = new Vector2(width, 80);
-        GetComponent<BoxCollider2D>().size = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x, 80);
+        width = text.GetComponent<RectTransform>().sizeDelta.x + 80;
+        box.GetComponent<RectTransform>().sizeDelta = fill.GetComponent<RectTransform>().sizeDelta = new Vector2(width, 60);
+        GetComponent<BoxCollider2D>().size = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x, 50);
         GetComponent<BoxCollider2D>().offset = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x / 2, 0);
     }
 
     void baseSlotVisible()
     {
-        baseSlot.transform.GetChild(0).GetComponent<Image>().color = new Color(1,1,1,1);
-        baseSlot.transform.GetChild(1).GetComponent<TMP_Text>().color = new Color(0.7f, 0.7f, 0.7f, 1);
+        baseSlot.transform.GetChild(0).GetComponent<Image>().color += new Color(0, 0, 0, 1);
+        baseSlot.transform.GetChild(1).GetComponent<TMP_Text>().color += new Color(0, 0, 0, 1);
         animator.enabled = false;
         transform.localScale = new Vector3(1,1,1);
     }

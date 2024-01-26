@@ -18,8 +18,8 @@ public class BlockOriginScript : MonoBehaviour
     IEnumerator DelayedStart()
     {
         yield return new WaitForEndOfFrame();
-        width = text.GetComponent<RectTransform>().sizeDelta.x + 100;
-        box.GetComponent<RectTransform>().sizeDelta = new Vector2(width, 80);
+        width = text.GetComponent<RectTransform>().sizeDelta.x + 80;
+        box.GetComponent<RectTransform>().sizeDelta = new Vector2(width, 60);
         //GetComponent<BoxCollider2D>().size = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x, 80);
         //GetComponent<BoxCollider2D>().offset = new Vector2(box.GetComponent<RectTransform>().sizeDelta.x / 2, 0);
     }
