@@ -6,11 +6,15 @@ using UnityEngine.UI;
 public class InterfaceScript : MonoBehaviour
 {
 
-    public Image situationalPool;
-    public Image generalPool;
-    public string currentPool = "situational";
-    public bool activePoolAnim = false;
+    public Image nounPool;
+    public Image verbPool;
+    public Image adjectivePool;
+    public Image colorOverlay;
+    public Image swapButtonIcon;
+    //1 - noun 2 - verb 3 - adjective
+    public int currentPool = 1;
     public bool swapAnimPlaying = false;
+    public bool appearAnimPlaying = false;
     public SceneLogic sceneLogic;
     public Animator animator;
     // Start is called before the first frame update
@@ -27,25 +31,34 @@ public class InterfaceScript : MonoBehaviour
 
     public void SwapPoolButtonClick()
     {
-        if(!swapAnimPlaying)
+        if(!swapAnimPlaying && !appearAnimPlaying)
         {
-            activePoolAnim = !activePoolAnim;
-            animator.SetBool("ActivePool", activePoolAnim);
+            currentPool++;
+            if (currentPool > 3) currentPool = 1;
+
+            animator.SetInteger("ActivePool", currentPool);
+            animator.SetTrigger("SwapButtonPressed");
         }
     }
 
     public void SwapPool()
     {
-        if(currentPool == "situational")
+        switch (currentPool)
         {
-            currentPool = "general";
-            situationalPool.transform.SetAsFirstSibling();
+            case 1:
+                nounPool.transform.SetAsLastSibling();
+                swapButtonIcon.sprite = Resources.Load<Sprite>("Sprites/Person_icon");
+                break;
+            case 2:
+                verbPool.transform.SetAsLastSibling();
+                swapButtonIcon.sprite = Resources.Load<Sprite>("Sprites/Verb_icon");
+                break;
+            case 3:
+                adjectivePool.transform.SetAsLastSibling();
+                swapButtonIcon.sprite = Resources.Load<Sprite>("Sprites/Star_icon");
+                break;
         }
-        else if (currentPool == "general")
-        {
-            currentPool = "situational";
-            generalPool.transform.SetAsFirstSibling();
-        }
+        colorOverlay.transform.SetAsLastSibling();
     }
 
     public void PoolAnimStart()
@@ -55,6 +68,7 @@ public class InterfaceScript : MonoBehaviour
     public void PoolAnimEnd()
     {
         swapAnimPlaying = false;
+        animator.SetInteger("ActivePool", 0);
     }
 
     public void PanelAppearAnimEnd()

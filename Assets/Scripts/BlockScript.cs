@@ -171,7 +171,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         collidedSlots.Remove(attachedSlot);
 
         container = jokePanel;
-        transform.SetParent(container.transform);
+        transform.SetParent(container.transform, true);
 
         slot.GetComponent<SlotScript>().SetContent(gameObject);
         StartCoroutine(sceneLogic.SortJokeBlocks());
@@ -255,20 +255,22 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     IEnumerator opacityPlus()
     {
-        while(box.color.a < 1f && !isCollidedBlock)
+        while(gameObject.transform.localScale.y > 1 && !isCollidedBlock)
         {
             yield return new WaitForEndOfFrame();
-            box.color += new Color(0, 0, 0, 0.1f);
-            text.color += new Color(0, 0, 0, 0.1f);
+            //box.color += new Color(0, 0, 0, 0.1f);
+            //text.color += new Color(0, 0, 0, 0.1f);
+            gameObject.transform.localScale -= new Vector3(0f, 0.02f, 0f);
         }
     }
     IEnumerator opacityMinus()
     {
-        while (box.color.a > 0.3f && isCollidedBlock)
+        while (gameObject.transform.localScale.y < 1.1f && isCollidedBlock)
         {
             yield return new WaitForEndOfFrame();
-            box.color -= new Color(0, 0, 0, 0.1f);
-            text.color -= new Color(0, 0, 0, 0.1f);
+            //box.color -= new Color(0, 0, 0, 0.1f);
+            //text.color -= new Color(0, 0, 0, 0.1f);
+            gameObject.transform.localScale += new Vector3(0f, 0.02f, 0f);
         }
     }
 }
