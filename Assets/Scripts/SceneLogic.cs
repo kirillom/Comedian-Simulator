@@ -25,6 +25,7 @@ public class SceneLogic : MonoBehaviour
     public Animator interfaceAnimator;
     public JokePanelScript jokePanelScript;
     public string[] audiences = { "teenagers", "teachers", "bikers", "" };
+    public AudioManager audioManager;
     //public const Dictionary<string, string[]> themedNouns;
 
     public bool isDraggingBlock = false;
@@ -183,13 +184,7 @@ public class SceneLogic : MonoBehaviour
                 }
             }
             GameObject block = Instantiate(blockPrefab, origin.transform.position, new Quaternion(0, 0, 0, 0), container.transform);
-            BlockScript blockScript = block.GetComponent<BlockScript>();
-            blockScript.container = container;
-            blockScript.jokePanel = jokePanel;
-            blockScript.mainInterface = mainInterface;
-            blockScript.sceneLogic = gameObject.GetComponent<SceneLogic>();
-            block.transform.GetChild(1).GetComponent<TMP_Text>().text = origin.transform.GetChild(1).GetComponent<TMP_Text>().text;
-            blockScript.baseSlot = origin;
+            block.GetComponent<BlockScript>().Initialize(origin.transform.GetChild(1).GetComponent<TMP_Text>().text, container, jokePanel, mainInterface, this, origin);
         }
         mainInterface.GetComponent<InterfaceScript>().appearAnimPlaying = false;
     }

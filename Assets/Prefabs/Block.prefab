@@ -57,6 +57,7 @@ MonoBehaviour:
   animator: {fileID: 8956805117452273647}
   attachedSlot: {fileID: 0}
   baseSlot: {fileID: 0}
+  blockPrefab: {fileID: 2351990447032327026}
   sceneLogic: {fileID: 0}
   colorOverlay: {fileID: 3071105340635167540}
   origin: {x: 910, y: 200, z: 0}

@@ -16,6 +16,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public Animator animator;
     public GameObject attachedSlot;
     public GameObject baseSlot;
+    public GameObject blockPrefab;
     public SceneLogic sceneLogic;
     public Image colorOverlay;
     public Vector3 origin;
@@ -40,7 +41,18 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     void Start()
     {
         animator.SetTrigger("Appear");
+        animator.SetBool("Hovering", false);
         origin = destination = transform.position;
+    }
+
+    public void Initialize(string text, GameObject container, GameObject jokePanel, GameObject mainInterface, SceneLogic sceneLogic, GameObject baseSlot)
+    {
+        transform.GetChild(1).GetComponent<TMP_Text>().text = text;
+        this.container = container;
+        this.jokePanel = jokePanel;
+        this.mainInterface = mainInterface;
+        this.sceneLogic = sceneLogic;
+        this.baseSlot = baseSlot;
         StartCoroutine(DelayedStart());
     }
 
@@ -57,7 +69,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         baseSlot.transform.GetChild(0).GetComponent<Image>().color += new Color(0, 0, 0, 1);
         baseSlot.transform.GetChild(1).GetComponent<TMP_Text>().color += new Color(0, 0, 0, 1);
-        animator.enabled = false;
+        //animator.enabled = false;
         transform.localScale = new Vector3(1,1,1);
     }
 
@@ -70,6 +82,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             if(Input.GetKeyDown(KeyCode.Mouse0))
             {
+                sceneLogic.audioManager.PlaySound("block_out");
                 isDragging = true;
                 if (attachedSlot != null)
                 {
@@ -77,18 +90,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                 }
                 transform.SetParent(mainInterface.transform, true);
             }
-            //if(transform.position.y < origin.y + 10 && !isDragging && !isMoving)
-            //{
-            //    transform.position += new Vector3(0, 1, 0);
-            //}
         }
-        //else
-        //{
-        //    if (transform.position.y > origin.y && !isDragging && !isMoving)
-        //    {
-        //        transform.position -= new Vector3(0, 1, 0);
-        //    }
-        //}
         if(isDragging)
         {
             if (Input.GetKeyUp(KeyCode.Mouse0))
@@ -111,6 +113,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                         attachedSlot.GetComponent<SlotScript>().ResetSlot();
                     }
 
+                    sceneLogic.audioManager.PlaySound("block_in");
                     OccupySlot(collidedSlots[0]);
                     
                 }
@@ -148,8 +151,8 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         if(attachedSlot == null)
         {
-            GameObject newBlock = Instantiate(gameObject, baseSlot.transform.position, new Quaternion(0, 0, 0, 0), container.transform);
-            newBlock.GetComponent<Animator>().enabled = true;
+            GameObject newBlock = Instantiate(blockPrefab, baseSlot.transform.position, new Quaternion(0, 0, 0, 0), container.transform);
+            newBlock.GetComponent<BlockScript>().Initialize(transform.GetChild(1).GetComponent<TMP_Text>().text, container, jokePanel, mainInterface, sceneLogic, baseSlot);
 
             if (slot.GetComponent<SlotScript>().attachedBlock != null)
             {
@@ -180,10 +183,12 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void OnPointerEnter(PointerEventData eventData)
     {
         isMouseOver = true;
+        animator.SetBool("Hovering", true);
     }
     public void OnPointerExit(PointerEventData eventData)
     {
         isMouseOver = false;
+        animator.SetBool("Hovering", false);
     }
     private void blockDrag()
     {
@@ -238,19 +243,14 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             if (collision.gameObject.GetComponent<BlockScript>().isDragging && attachedSlot != null)
             {
-                isCollidedBlock = true;
-                StartCoroutine(opacityMinus());
+                animator.SetBool("Displaced", true);
             }
         }
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
         collidedSlots.Remove(collision.gameObject);
-        if(isCollidedBlock)
-        {
-            isCollidedBlock = false;
-            StartCoroutine(opacityPlus());
-        }
+        animator.SetBool("Displaced", false);
     }
 
     IEnumerator opacityPlus()
