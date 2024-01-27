@@ -16,7 +16,7 @@ public class JokePanelScript : MonoBehaviour
     {
         if (GetComponent<RectTransform>().sizeDelta.y != height)
         {
-            GetComponent<RectTransform>().sizeDelta = Vector2.Lerp(GetComponent<RectTransform>().sizeDelta, new Vector2(1800, height), 0.2f);
+            GetComponent<RectTransform>().sizeDelta = Vector2.Lerp(GetComponent<RectTransform>().sizeDelta, new Vector2(1850, height), 0.2f);
         }
     }
 }

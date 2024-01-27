@@ -90,17 +90,17 @@ public class SceneLogic : MonoBehaviour
 
                 if(word == "/n")
                 {
-                    newSlot.transform.GetChild(0).GetComponent<Image>().color = new Color(214f/255f, 94f/255f, 43f/255f, 1);
+                    newSlot.transform.GetChild(0).GetComponent<Image>().color = new Color(0.84f, 0.37f, 0.17f, 1);
                     newSlot.GetComponent<SlotScript>().type = 1;
                 }
                 else if (word == "/v")
                 {
-                    newSlot.transform.GetChild(0).GetComponent<Image>().color = new Color(98f/255f, 171f/255f, 46f/255f, 1);
+                    newSlot.transform.GetChild(0).GetComponent<Image>().color = new Color(0.38f, 0.67f, 0.18f, 1);
                     newSlot.GetComponent<SlotScript>().type = 2;
                 }
                 else if (word == "/a")
                 {
-                    newSlot.transform.GetChild(0).GetComponent<Image>().color = new Color(57f/255f, 87f/255f, 168f/255f, 1);
+                    newSlot.transform.GetChild(0).GetComponent<Image>().color = new Color(0.22f, 0.34f, 0.66f, 1);
                     newSlot.GetComponent<SlotScript>().type = 3;
                 }
             }
@@ -110,6 +110,8 @@ public class SceneLogic : MonoBehaviour
                 newSlot.GetComponent<SlotScript>().isSlotOptional = true;
                 jokeBlocks.Add(newSlot);
                 newSlot.GetComponent<SlotScript>().index = jokeBlocks.Count - 1;
+                newSlot.transform.GetChild(0).GetComponent<RawImage>().color = newSlot.transform.GetChild(1).GetComponent<Image>().color = newSlot.transform.GetChild(2).GetComponent<Image>().color = new Color(57f / 255f, 87f / 255f, 168f / 255f, 1);
+                newSlot.GetComponent<SlotScript>().type = 3;
             }
             else
             {

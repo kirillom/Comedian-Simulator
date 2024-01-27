@@ -69,8 +69,20 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     void baseSlotVisible()
     {
-        baseSlot.transform.GetChild(0).GetComponent<Image>().color += new Color(0, 0, 0, 1);
-        baseSlot.transform.GetChild(1).GetComponent<TMP_Text>().color += new Color(0, 0, 0, 1);
+        Color typeColor = new Color(0,0,0);
+        if(type == 1)
+        {
+            typeColor = new Color(0.84f, 0.37f, 0.17f, 1);
+        }
+        else if (type == 2)
+        {
+            typeColor = new Color(0.38f, 0.67f, 0.18f, 1);
+        }
+        else if (type == 3)
+        {
+            typeColor = new Color(0.22f, 0.34f, 0.66f, 1);
+        }
+        baseSlot.transform.GetChild(0).GetComponent<Image>().color = baseSlot.transform.GetChild(1).GetComponent<TMP_Text>().color = typeColor;
         //animator.enabled = false;
         transform.localScale = new Vector3(1,1,1);
     }
@@ -113,7 +125,6 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                         if (collidedSlots[i].GetComponent<SlotScript>().type == type)
                         {
                             hasMatchingType = true;
-                            break;
                         }
                         else
                         {
@@ -149,6 +160,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                 else
                 {
                     transform.SetParent(container.transform, true);
+                    sceneLogic.audioManager.PlaySound("click");
                 }
                 isDragging = false;
                 MoveToDestination();
