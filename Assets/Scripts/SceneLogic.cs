@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,6 +30,7 @@ public class SceneLogic : MonoBehaviour
     public JokePanelScript jokePanelScript;
     public string[] audiences = { "teenagers", "teachers", "bikers", "" };
     public AudioManager audioManager;
+    public Animator cameraAnimator;
     //public const Dictionary<string, string[]> themedNouns;
 
     public bool isDraggingBlock = false;
@@ -42,9 +45,7 @@ public class SceneLogic : MonoBehaviour
         Application.targetFrameRate = fps;
         if(Input.GetKeyDown(KeyCode.R))
         {
-            //what do you call a _ _ ? _ !
-            string joke = "Why did the /n /n ? Because /o /o ! Also some more text to test.";
-            NewJoke(joke);
+            InitializeJoke();
         }
 
         if(isDraggingBlock)
@@ -53,18 +54,26 @@ public class SceneLogic : MonoBehaviour
         }
     }
 
+    public void InitializeJoke()
+    {
+        cameraAnimator.SetBool("IsZoomed", true);
+        string joke = "Why did the /oa /n /v ? Because /a /n ! Also some more text to test.";
+        StartCoroutine(NewJoke(joke));
+    }
+
     public void CreateWordPool()
     {
         string[] nounWords = { "dog", "man", "house", "depression", "moon", "parents", "bike", "chicken nuggets" };
         string[] verbWords = { "burn", "die", "survive", "obey", "ask", "freeze", "study", "do", "make" };
         string[] adjectiveWords = { "very", "hot", "burning", "stupid", "democratic", "dark", "absurd", "dying", "laughing" };
-        InstantiateBlockSlots(nounWordsContainer, ref nounWordBlocks, nounWords, nounBlockPrefab);
-        InstantiateBlockSlots(verbWordsContainer, ref verbWordBlocks, verbWords, verbBlockPrefab);
-        InstantiateBlockSlots(adjectiveWordsContainer, ref adjectiveWordBlocks, adjectiveWords, adjectiveBlockPrefab);
+        InstantiateBlockSlots(nounWordsContainer, ref nounWordBlocks, nounWords, nounBlockPrefab, 1);
+        InstantiateBlockSlots(verbWordsContainer, ref verbWordBlocks, verbWords, verbBlockPrefab, 2);
+        InstantiateBlockSlots(adjectiveWordsContainer, ref adjectiveWordBlocks, adjectiveWords, adjectiveBlockPrefab, 3);
     }
 
-    public void NewJoke(string joke)
+    public IEnumerator NewJoke(string joke)
     {
+        yield return new WaitForSeconds(3);
         mainInterface.GetComponent<InterfaceScript>().appearAnimPlaying = true;
         //string joke = "What did the \0 say to the \0 ? \0 !";
         string[] separatedWords = joke.Split(" ");
@@ -73,13 +82,29 @@ public class SceneLogic : MonoBehaviour
 
         foreach (string word in separatedWords)
         {
-            if(word == "/n")
+            if(word == "/n" || word == "/v" || word == "/a")
             {
                 GameObject newSlot = Instantiate(slotPrefab, new Vector3(-100,-100,0), new Quaternion(0,0,0,0), jokePanel.transform);
                 jokeBlocks.Add(newSlot);
                 newSlot.GetComponent<SlotScript>().index = jokeBlocks.Count - 1;
+
+                if(word == "/n")
+                {
+                    newSlot.transform.GetChild(0).GetComponent<Image>().color = new Color(214f/255f, 94f/255f, 43f/255f, 1);
+                    newSlot.GetComponent<SlotScript>().type = 1;
+                }
+                else if (word == "/v")
+                {
+                    newSlot.transform.GetChild(0).GetComponent<Image>().color = new Color(98f/255f, 171f/255f, 46f/255f, 1);
+                    newSlot.GetComponent<SlotScript>().type = 2;
+                }
+                else if (word == "/a")
+                {
+                    newSlot.transform.GetChild(0).GetComponent<Image>().color = new Color(57f/255f, 87f/255f, 168f/255f, 1);
+                    newSlot.GetComponent<SlotScript>().type = 3;
+                }
             }
-            else if(word == "/o")
+            else if(word == "/oa")
             {
                 GameObject newSlot = Instantiate(optionalSlotPrefab, new Vector3(-100, -100, 0), new Quaternion(0, 0, 0, 0), jokePanel.transform);
                 newSlot.GetComponent<SlotScript>().isSlotOptional = true;
@@ -149,7 +174,7 @@ public class SceneLogic : MonoBehaviour
         }
     }
 
-    public void InstantiateBlockSlots(GameObject container, ref List<GameObject> wordBlocks, string[] words, GameObject blockPrefab)
+    public void InstantiateBlockSlots(GameObject container, ref List<GameObject> wordBlocks, string[] words, GameObject blockPrefab, int type)
     {
         foreach (string word in words)
         {
@@ -158,10 +183,10 @@ public class SceneLogic : MonoBehaviour
             wordBlocks.Add(newWord);
         }
 
-        StartCoroutine(SortWordBlocks(container, wordBlocks, blockPrefab));
+        StartCoroutine(SortWordBlocks(container, wordBlocks, blockPrefab, type));
     }
 
-    public IEnumerator SortWordBlocks(GameObject container, List<GameObject> wordBlocks, GameObject blockPrefab)
+    public IEnumerator SortWordBlocks(GameObject container, List<GameObject> wordBlocks, GameObject blockPrefab, int type)
     {
         for (int i = 0; i < wordBlocks.Count; i++)
         {
@@ -183,7 +208,7 @@ public class SceneLogic : MonoBehaviour
                 }
             }
             GameObject block = Instantiate(blockPrefab, origin.transform.position, new Quaternion(0, 0, 0, 0), container.transform);
-            block.GetComponent<BlockScript>().Initialize(origin.transform.GetChild(1).GetComponent<TMP_Text>().text, container, jokePanel, mainInterface, this, origin);
+            block.GetComponent<BlockScript>().Initialize(origin.transform.GetChild(1).GetComponent<TMP_Text>().text, container, jokePanel, mainInterface, this, origin, type);
         }
         mainInterface.GetComponent<InterfaceScript>().appearAnimPlaying = false;
     }
