@@ -14,6 +14,7 @@ public class SlotScript : MonoBehaviour
     public bool isSlotOptional;
     public Image slot;
     public int index;
+    public int type;
     // Start is called before the first frame update
     void Start()
     {

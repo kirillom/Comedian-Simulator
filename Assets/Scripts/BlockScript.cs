@@ -33,6 +33,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public float width;
     public float speed;
     public float distance;
+    public int type;
     private bool isCollidedBlock;
     public GameObject container;
     public GameObject jokePanel;
@@ -45,7 +46,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         origin = destination = transform.position;
     }
 
-    public void Initialize(string text, GameObject container, GameObject jokePanel, GameObject mainInterface, SceneLogic sceneLogic, GameObject baseSlot)
+    public void Initialize(string text, GameObject container, GameObject jokePanel, GameObject mainInterface, SceneLogic sceneLogic, GameObject baseSlot, int type)
     {
         transform.GetChild(1).GetComponent<TMP_Text>().text = text;
         this.container = container;
@@ -53,6 +54,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         this.mainInterface = mainInterface;
         this.sceneLogic = sceneLogic;
         this.baseSlot = baseSlot;
+        this.type = type;
         StartCoroutine(DelayedStart());
     }
 
@@ -105,17 +107,44 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                 sceneLogic.wordsPanelAnimator.SetBool("Hovering", false);
                 if (collidedSlots.Count > 0)
                 {
-                    if(collidedSlots.Count > 1)
+                    bool hasMatchingType = false;
+                    for(int i = 0; i < collidedSlots.Count; i++)
+                    {
+                        if (collidedSlots[i].GetComponent<SlotScript>().type == type)
+                        {
+                            hasMatchingType = true;
+                            break;
+                        }
+                        else
+                        {
+                            collidedSlots.Remove(collidedSlots[i]);
+                            i--;
+                        }
+                    }
+                    if(!hasMatchingType)
+                    {
+                        sceneLogic.audioManager.PlaySound("forbidden");
+                    }
+
+                    if (collidedSlots.Count > 1)
                     {
                         collidedSlots = collidedSlots.OrderBy(o => Vector3.Distance(transform.position, o.transform.position)).ToList();
                     }
-                    if (attachedSlot != collidedSlots[0] && attachedSlot != null)
+
+                    if(collidedSlots.Count > 0)
                     {
-                        attachedSlot.GetComponent<SlotScript>().ResetSlot();
+                        if (attachedSlot != collidedSlots[0] && attachedSlot != null)
+                        {
+                            attachedSlot.GetComponent<SlotScript>().ResetSlot();
+                        }
+
+                        OccupySlot(collidedSlots[0], true);
+                    }
+                    else
+                    {
+                        transform.SetParent(container.transform, true);
                     }
 
-                    OccupySlot(collidedSlots[0], true);
-                    
                 }
                 else
                 {
@@ -152,7 +181,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         if(attachedSlot == null)
         {
             GameObject newBlock = Instantiate(blockPrefab, baseSlot.transform.position, new Quaternion(0, 0, 0, 0), container.transform);
-            newBlock.GetComponent<BlockScript>().Initialize(transform.GetChild(1).GetComponent<TMP_Text>().text, container, jokePanel, mainInterface, sceneLogic, baseSlot);
+            newBlock.GetComponent<BlockScript>().Initialize(transform.GetChild(1).GetComponent<TMP_Text>().text, container, jokePanel, mainInterface, sceneLogic, baseSlot, type);
 
             if (slot.GetComponent<SlotScript>().attachedBlock != null)
             {
