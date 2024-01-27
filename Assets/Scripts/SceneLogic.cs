@@ -19,7 +19,9 @@ public class SceneLogic : MonoBehaviour
     public GameObject wordPrefab;
     public GameObject slotPrefab;
     public GameObject optionalSlotPrefab;
-    public GameObject blockPrefab;
+    public GameObject nounBlockPrefab;
+    public GameObject verbBlockPrefab;
+    public GameObject adjectiveBlockPrefab;
     public GameObject blockOriginPrefab;
     public Animator wordsPanelAnimator;
     public Animator interfaceAnimator;
@@ -56,9 +58,9 @@ public class SceneLogic : MonoBehaviour
         string[] nounWords = { "dog", "man", "house", "depression", "moon", "parents", "bike", "chicken nuggets" };
         string[] verbWords = { "burn", "die", "survive", "obey", "ask", "freeze", "study", "do", "make" };
         string[] adjectiveWords = { "very", "hot", "burning", "stupid", "democratic", "dark", "absurd", "dying", "laughing" };
-        InstantiateBlockSlots(nounWordsContainer, ref nounWordBlocks, nounWords);
-        InstantiateBlockSlots(verbWordsContainer, ref verbWordBlocks, verbWords);
-        InstantiateBlockSlots(adjectiveWordsContainer, ref adjectiveWordBlocks, adjectiveWords);
+        InstantiateBlockSlots(nounWordsContainer, ref nounWordBlocks, nounWords, nounBlockPrefab);
+        InstantiateBlockSlots(verbWordsContainer, ref verbWordBlocks, verbWords, verbBlockPrefab);
+        InstantiateBlockSlots(adjectiveWordsContainer, ref adjectiveWordBlocks, adjectiveWords, adjectiveBlockPrefab);
     }
 
     public void NewJoke(string joke)
@@ -147,7 +149,7 @@ public class SceneLogic : MonoBehaviour
         }
     }
 
-    public void InstantiateBlockSlots(GameObject container, ref List<GameObject> wordBlocks, string[] words)
+    public void InstantiateBlockSlots(GameObject container, ref List<GameObject> wordBlocks, string[] words, GameObject blockPrefab)
     {
         foreach (string word in words)
         {
@@ -156,10 +158,10 @@ public class SceneLogic : MonoBehaviour
             wordBlocks.Add(newWord);
         }
 
-        StartCoroutine(SortWordBlocks(container, wordBlocks));
+        StartCoroutine(SortWordBlocks(container, wordBlocks, blockPrefab));
     }
 
-    public IEnumerator SortWordBlocks(GameObject container, List<GameObject> wordBlocks)
+    public IEnumerator SortWordBlocks(GameObject container, List<GameObject> wordBlocks, GameObject blockPrefab)
     {
         for (int i = 0; i < wordBlocks.Count; i++)
         {
