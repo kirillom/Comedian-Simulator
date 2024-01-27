@@ -33,6 +33,7 @@ public class InterfaceScript : MonoBehaviour
     {
         if(!swapAnimPlaying && !appearAnimPlaying)
         {
+            sceneLogic.audioManager.PlaySound("shuffle");
             currentPool++;
             if (currentPool > 3) currentPool = 1;
 

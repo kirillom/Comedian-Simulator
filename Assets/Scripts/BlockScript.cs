@@ -98,6 +98,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                 if (Input.mousePosition.y < 350 && attachedSlot != null)
                 {
                     attachedSlot.GetComponent<SlotScript>().ResetSlot();
+                    sceneLogic.audioManager.PlaySound("pop");
                     Destroy(gameObject);
                 }
                 sceneLogic.wordsPanelAnimator.SetBool("ShowTrashBin", false);
@@ -113,8 +114,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                         attachedSlot.GetComponent<SlotScript>().ResetSlot();
                     }
 
-                    sceneLogic.audioManager.PlaySound("block_in");
-                    OccupySlot(collidedSlots[0]);
+                    OccupySlot(collidedSlots[0], true);
                     
                 }
                 else
@@ -147,7 +147,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         }
     }
 
-    public void OccupySlot(GameObject slot)
+    public void OccupySlot(GameObject slot, bool playSound)
     {
         if(attachedSlot == null)
         {
@@ -163,11 +163,14 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             if (slot.GetComponent<SlotScript>().attachedBlock != null && slot.GetComponent<SlotScript>().attachedBlock != gameObject)
             {
+                sceneLogic.audioManager.PlaySound("swap");
+                playSound = false;
                 slot.GetComponent<SlotScript>().attachedBlock.transform.GetChild(0).GetComponent<Image>().color += new Color(0, 0, 0, 1);
                 slot.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().color += new Color(0, 0, 0, 1);
-                slot.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().OccupySlot(attachedSlot);
+                slot.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().OccupySlot(attachedSlot, false);
             }
         }
+        if(playSound) sceneLogic.audioManager.PlaySound("block_in");
 
         attachedSlot = slot;
 

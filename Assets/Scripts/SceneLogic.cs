@@ -138,9 +138,6 @@ public class SceneLogic : MonoBehaviour
 
                 block.GetComponent<SegmentScript>().destination = destination;
 
-                Debug.Log(block.GetComponent<SegmentScript>().destination.y);
-                Debug.Log(block.transform.localPosition.y);
-
                 if (block.GetComponent<SlotScript>() != null && block.GetComponent<SlotScript>().attachedBlock != null)
                 {
                     block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().destination = block.transform.TransformPoint(Vector3.zero) + (destination - block.transform.localPosition);
