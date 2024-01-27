@@ -208,8 +208,6 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             {
                 sceneLogic.audioManager.PlaySound("swap");
                 playSound = false;
-                slot.GetComponent<SlotScript>().attachedBlock.transform.GetChild(0).GetComponent<Image>().color += new Color(0, 0, 0, 1);
-                slot.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().color += new Color(0, 0, 0, 1);
                 slot.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().OccupySlot(attachedSlot, false);
             }
         }

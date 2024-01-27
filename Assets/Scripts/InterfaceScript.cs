@@ -80,4 +80,13 @@ public class InterfaceScript : MonoBehaviour
     {
 
     }
+
+    public void MouseOverReadyButton()
+    {
+        animator.SetBool("ReadyButtonHovered", true);
+    }
+    public void MouseOutReadyButton()
+    {
+        animator.SetBool("ReadyButtonHovered", false);
+    }
 }

@@ -14,6 +14,7 @@ public class SceneLogic : MonoBehaviour
     public List<GameObject> verbWordBlocks;
     public List<GameObject> adjectiveWordBlocks;
     public GameObject jokePanel;
+    public GameObject blockPanel;
     public GameObject mainInterface;
     public GameObject nounWordsContainer;
     public GameObject verbWordsContainer;
@@ -84,7 +85,7 @@ public class SceneLogic : MonoBehaviour
         {
             if(word == "/n" || word == "/v" || word == "/a")
             {
-                GameObject newSlot = Instantiate(slotPrefab, new Vector3(-100,-100,0), new Quaternion(0,0,0,0), jokePanel.transform);
+                GameObject newSlot = Instantiate(slotPrefab, new Vector3(-1000,-1000,0), new Quaternion(0,0,0,0), jokePanel.transform);
                 jokeBlocks.Add(newSlot);
                 newSlot.GetComponent<SlotScript>().index = jokeBlocks.Count - 1;
 
@@ -106,7 +107,7 @@ public class SceneLogic : MonoBehaviour
             }
             else if(word == "/oa")
             {
-                GameObject newSlot = Instantiate(optionalSlotPrefab, new Vector3(-100, -100, 0), new Quaternion(0, 0, 0, 0), jokePanel.transform);
+                GameObject newSlot = Instantiate(optionalSlotPrefab, new Vector3(-1000, -1000, 0), new Quaternion(0, 0, 0, 0), jokePanel.transform);
                 newSlot.GetComponent<SlotScript>().isSlotOptional = true;
                 jokeBlocks.Add(newSlot);
                 newSlot.GetComponent<SlotScript>().index = jokeBlocks.Count - 1;
@@ -115,7 +116,7 @@ public class SceneLogic : MonoBehaviour
             }
             else
             {
-                GameObject newWord = Instantiate(wordPrefab, new Vector3(-100, -100, 0), new Quaternion(0, 0, 0, 0), jokePanel.transform);
+                GameObject newWord = Instantiate(wordPrefab, new Vector3(-1000, -1000, 0), new Quaternion(0, 0, 0, 0), jokePanel.transform);
                 newWord.GetComponent<TMP_Text>().text = word;
                 jokeBlocks.Add(newWord);
             }
@@ -129,48 +130,73 @@ public class SceneLogic : MonoBehaviour
         yield return new WaitForEndOfFrame();
         yield return new WaitForEndOfFrame();
         bool hasLowered = false;
+        bool hasUppered = false;
         for (int i = 0; i < jokeBlocks.Count; i++)
         {
             GameObject block = jokeBlocks[i];
             Vector3 destination;
             if (i == 0)
             {
-                block.GetComponent<SegmentScript>().destination = new Vector2(-830, 70);
+                block.GetComponent<SegmentScript>().destination = new Vector2(-830, 130);
             }
             else
             {
-                Vector3 previousBlockPos = jokeBlocks[i - 1].GetComponent<SegmentScript>().destination;
+                Vector2 previousBlockPos = jokeBlocks[i - 1].GetComponent<SegmentScript>().destination;
 
-                destination = new Vector3(previousBlockPos.x + jokeBlocks[i - 1].GetComponent<SegmentScript>().dimensions.x + 15, previousBlockPos.y);
+                destination = new Vector2(previousBlockPos.x + jokeBlocks[i - 1].GetComponent<SegmentScript>().dimensions.x + 15, previousBlockPos.y);
 
                 if (destination.x + block.GetComponent<SegmentScript>().dimensions.x > 830)
                 {
-                    jokePanelScript.height += 120;
-                    for(int j = 0; j < i; j++)
-                    {
-                        Vector3 oldDestination = jokeBlocks[j].GetComponent<SegmentScript>().destination;
-                        oldDestination = new Vector2(oldDestination.x, oldDestination.y + 65);
-                        jokeBlocks[j].GetComponent<SegmentScript>().destination = oldDestination;
-                        if (jokeBlocks[j].GetComponent<SlotScript>() != null && jokeBlocks[j].GetComponent<SlotScript>().attachedBlock != null)
-                        {
-                            jokeBlocks[j].GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().destination = jokeBlocks[j].transform.TransformPoint(Vector3.zero) + (oldDestination - jokeBlocks[j].transform.localPosition);
-                            jokeBlocks[j].GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
-                        }
-                    }
-                    destination = new Vector3(-830, destination.y);
+                    destination = new Vector2(-830, destination.y - 70);
+                    block.GetComponent<SegmentScript>().destination = destination;
                 }
-                else if (destination.y < block.GetComponent<SegmentScript>().destination.y && !hasLowered)
+                if (destination.y < block.GetComponent<SegmentScript>().destination.y && !hasUppered)
+                {
+                    hasUppered = true;
+                    jokePanelScript.height += 70;
+                }
+                else if (destination.y > block.GetComponent<SegmentScript>().destination.y && !hasLowered)
                 {
                     hasLowered = true;
-                    jokePanelScript.height -= 120;
+                    jokePanelScript.height -= 70;
                 }
-
                 block.GetComponent<SegmentScript>().destination = destination;
 
                 if (block.GetComponent<SlotScript>() != null && block.GetComponent<SlotScript>().attachedBlock != null)
                 {
                     block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().destination = block.transform.TransformPoint(Vector3.zero) + (destination - block.transform.localPosition);
-                    block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
+                }
+            }
+        }
+        if (hasLowered)
+        {
+            foreach (GameObject gameObject in jokeBlocks)
+            {
+                if (gameObject.GetComponent<SlotScript>() != null && gameObject.GetComponent<SlotScript>().attachedBlock != null)
+                {
+                    gameObject.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().destination -= new Vector3(0, 70, 0);
+                    gameObject.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
+                }
+            }
+        }
+        else if (hasUppered)
+        {
+            foreach (GameObject gameObject in jokeBlocks)
+            {
+                if (gameObject.GetComponent<SlotScript>() != null && gameObject.GetComponent<SlotScript>().attachedBlock != null)
+                {
+                    gameObject.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().destination += new Vector3(0, 70, 0);
+                    gameObject.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
+                }
+            }
+        }
+        else
+        {
+            foreach (GameObject gameObject in jokeBlocks)
+            {
+                if (gameObject.GetComponent<SlotScript>() != null && gameObject.GetComponent<SlotScript>().attachedBlock != null)
+                {
+                    gameObject.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
                 }
             }
         }
@@ -180,7 +206,7 @@ public class SceneLogic : MonoBehaviour
     {
         foreach (string word in words)
         {
-            GameObject newWord = Instantiate(blockOriginPrefab, new Vector3(-100, -100, 0), new Quaternion(0, 0, 0, 0), container.transform);
+            GameObject newWord = Instantiate(blockOriginPrefab, new Vector3(-1000, -1000, 0), new Quaternion(0, 0, 0, 0), container.transform);
             newWord.transform.GetChild(1).GetComponent<TMP_Text>().text = word;
             wordBlocks.Add(newWord);
         }
@@ -210,8 +236,44 @@ public class SceneLogic : MonoBehaviour
                 }
             }
             GameObject block = Instantiate(blockPrefab, origin.transform.position, new Quaternion(0, 0, 0, 0), container.transform);
-            block.GetComponent<BlockScript>().Initialize(origin.transform.GetChild(1).GetComponent<TMP_Text>().text, container, jokePanel, mainInterface, this, origin, type);
+            block.GetComponent<BlockScript>().Initialize(origin.transform.GetChild(1).GetComponent<TMP_Text>().text, container, blockPanel, mainInterface, this, origin, type);
         }
         mainInterface.GetComponent<InterfaceScript>().appearAnimPlaying = false;
+    }
+
+    public void FinishJoke()
+    {
+        interfaceAnimator.SetBool("ActivePanel", false);
+        cameraAnimator.SetBool("IsZoomed", false);
+        StartCoroutine(Purge());
+        jokeBlocks.Clear();
+        nounWordBlocks.Clear();
+        verbWordBlocks.Clear();
+        adjectiveWordBlocks.Clear();
+    }
+    IEnumerator Purge()
+    {
+        yield return new WaitForSeconds(1);
+        jokePanelScript.height = 20;
+        foreach (Transform child in nounWordsContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in verbWordsContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in adjectiveWordsContainer.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in jokePanel.transform)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in blockPanel.transform)
+        {
+            Destroy(child.gameObject);
+        }
     }
 }
