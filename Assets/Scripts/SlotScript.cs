@@ -109,8 +109,8 @@ public class SlotScript : MonoBehaviour
 
     void SetOptionalSlotWidth(float width)
     {
-        transform.GetChild(0).GetComponent<RectTransform>().sizeDelta = new Vector2(width - 70, 60);
-        transform.GetChild(0).GetComponent<RawImage>().uvRect = new Rect(0,0, (width - 70) / 75, 1);
+        transform.GetChild(0).GetComponent<RectTransform>().sizeDelta = new Vector2(width - 85, 60);
+        transform.GetChild(0).GetComponent<RawImage>().uvRect = new Rect(0,0, (width - 85) / 25, 1);
         transform.GetChild(2).GetComponent<RectTransform>().anchoredPosition = new Vector2(width, 0);
     }
 }

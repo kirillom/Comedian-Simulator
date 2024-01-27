@@ -57,7 +57,7 @@ public class SceneLogic : MonoBehaviour
     public void InitializeJoke()
     {
         cameraAnimator.SetBool("IsZoomed", true);
-        string joke = "Why did the /oa /n /v ? Because /a /n ! Also some more text to test.";
+        string joke = "Why did the /oa /n /v ? Because /a /n !";
         StartCoroutine(NewJoke(joke));
     }
 

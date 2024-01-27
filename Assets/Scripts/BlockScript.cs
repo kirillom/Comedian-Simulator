@@ -97,6 +97,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             if(Input.GetKeyDown(KeyCode.Mouse0))
             {
                 sceneLogic.audioManager.PlaySound("block_out");
+                animator.SetBool("Dragging", true);
                 isDragging = true;
                 if (attachedSlot != null)
                 {
@@ -117,6 +118,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
                 }
                 sceneLogic.wordsPanelAnimator.SetBool("ShowTrashBin", false);
                 sceneLogic.wordsPanelAnimator.SetBool("Hovering", false);
+                animator.SetBool("Dragging", false);
                 if (collidedSlots.Count > 0)
                 {
                     bool hasMatchingType = false;
