@@ -352,9 +352,18 @@ public class SceneLogic : MonoBehaviour
         interfaceAnimator.SetBool("MonologueBoxOpen", false);
     }
 
+    public void CrowdBadReaction()
+    {
+
+    }
+    public void CrowdNeutralReaction()
+    {
+        audioManager.PlaySound("crowd_clapping");
+    }
     public void CrowdGoodReaction()
     {
-        foreach(Transform person in crowd.transform)
+        audioManager.PlaySound("crowd_laughing");
+        foreach (Transform person in crowd.transform)
         {
             StartCoroutine(person.gameObject.GetComponent<PersonScript>().Jump());
         }
