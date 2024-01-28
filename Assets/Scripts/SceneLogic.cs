@@ -1,10 +1,19 @@
+using OpenCover.Framework.Model;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Globalization;
 using System.Linq.Expressions;
+using System.Security.Principal;
+using System.Text.RegularExpressions;
 using TMPro;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
+using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SocialPlatforms.Impl;
 //using static System.Net.Mime.MediaTypeNames;
 
 public class SceneLogic : MonoBehaviour
@@ -32,10 +41,215 @@ public class SceneLogic : MonoBehaviour
     public Animator wordsPanelAnimator;
     public Animator interfaceAnimator;
     public JokePanelScript jokePanelScript;
-    public string[] audiences = { "teenagers", "teachers", "bikers", "" };
+    string audience;
+    public int score;
+    private string[] audiences = { "Teenagers", "Teachers", "Vegeterians", "Parents", "Old people", "Children", "Pet lovers", "Environmental activists", "Programmers", "Bookworms", "Gym bros", "Gamers", "Foodies", "Entrepreneurs", "Artists", "Students" };
+    public Dictionary<string, string[]> nounWords = new Dictionary<string, string[]>
+    { 
+        ["Teenagers"] = new string[] 
+        {
+            "school", "teenager", "homework", "friend", "my first love", "parents", "nerd"
+        },
+        ["Teachers"] = new string[]
+        {
+            "school", "student", "workbook", "textbook", "principal", "teacher"
+        },
+        ["Vegeterians"] = new string[]
+        {
+            "food", "apple", "grass", "chicken"
+        },
+        ["Parents"] = new string[]
+        {
+            "child", "son", "daughter", "husband", "wife"
+        },
+        ["Old people"] = new string[]
+        {
+            "grandpa", "grandma", "man", "grandchild"
+        },
+        ["Children"] = new string[]
+        {
+            "parents", "mom", "dad", "toys", "candy", "baby"
+        },
+        ["Pet lovers"] = new string[]
+        {
+            "cat", "dog", "dog toys", "parrot", "cow"
+        },
+        ["Environmental activists"] = new string[]
+        {
+            "grass", "tree", "garbage", "trash", "trash bin", "climate"
+        },
+        ["Programmers"] = new string[]
+        {
+            "computer", "iphone", "Elon Mask", "mouse", "deadline", "code"
+        },
+        ["Bookworms"] = new string[]
+        {
+            "book", "reader", "word", "joke"
+        },
+        ["Gym bros"] = new string[]
+        {
+            "bro", "protein", "gym", "gym bro", "steroids", "sis"
+        },
+        ["Gamers"] = new string[]
+        {
+            "game", "Mario", "Dota 2", "skill issue"
+        },
+        ["Foodies"] = new string[]
+        {
+            "food", "chicken nuggets", "fries", "pizza", "burger", "chips", "fish"
+        },
+        ["Entrepreneurs"] = new string[]
+        {
+            "money", "principal", "boss", "team", "leader", ""
+        },
+        ["Artists"] = new string[]
+        {
+            "artist", "paint", "painting", "van Gogh", "god"
+        },
+        ["Students"] = new string[]
+        {
+            "school", "teacher", "professor", "scientist", "lesson", "workbook", "textbook", "homework"
+        },
+    };
+    public Dictionary<string, string[]> verbWords = new Dictionary<string, string[]>
+    {
+        ["Teenagers"] = new string[]
+        {
+            "love", "study", "die", "party", "chat", "game", "swear", "bully", "abuse", "hang out"
+        },
+        ["Teachers"] = new string[]
+        {
+            "teach", "shout", "ask a question", "assign a homework"
+        },
+        ["Vegeterians"] = new string[]
+        {
+            "eat", "meditate", "photosynthesize"
+        },
+        ["Parents"] = new string[]
+        {
+            "love", "berate", "die"
+        },
+        ["Old people"] = new string[]
+        {
+            "die", "get old", "complain", "grumble"
+        },
+        ["Children"] = new string[]
+        {
+            "play", "laugh", "cry", "yell", "eat sweets"
+        },
+        ["Pet lovers"] = new string[]
+        {
+            "pet", "walk", "hug"
+        },
+        ["Environmental activists"] = new string[]
+        {
+            "protest", "protect nature", "plant a tree"
+        },
+        ["Programmers"] = new string[]
+        {
+            "work 24/7", "chill", "code"
+        },
+        ["Bookworms"] = new string[]
+        {
+            "read books", "drink tea", "read novels"
+        },
+        ["Gym bros"] = new string[]
+        {
+            "workout", "lift weights", "pump muscles", "get covered in oil"
+        },
+        ["Gamers"] = new string[]
+        {
+            "play games", "drink energy drinks", "chat", "stream games", "go outside", "touch grass", "get good"
+        },
+        ["Foodies"] = new string[]
+        {
+            "eat", "cook", "make a picnic"
+        },
+        ["Entrepreneurs"] = new string[]
+        {
+            "make money", "call a meeting", "work 24/7", "drink a lot of coffee"
+        },
+        ["Artist"] = new string[]
+        {
+            "go to museum", "paint", "create a masterpiece", "dream"
+        },
+        ["Students"] = new string[]
+        {
+            "get drunk", "study", "date", "party", "bully kids"
+        },
+    };
+    public Dictionary<string, string[]> adjectiveWords = new Dictionary<string, string[]>
+    {
+        ["Teenagers"] = new string[]
+        {
+            "young", "smart", "emotionally unstable", "angry", "edgy"
+        },
+        ["Teachers"] = new string[]
+        {
+            "boring", "angry", "loud"
+        },
+        ["Vegeterians"] = new string[]
+        {
+            "green", "healthy", "hungry"
+        },
+        ["Parents"] = new string[]
+        {
+            "tired", "loving", "caring"
+        },
+        ["Old people"] = new string[]
+        {
+            "tired", "sick", "wise", "calm"
+        },
+        ["Children"] = new string[]
+        {
+            "cute", "loud", "pink", "small", "playful", "sweet"
+        },
+        ["Pet lovers"] = new string[]
+        {
+            "playful", "cute", "kind", "caring", "loving", "fluffy", "squishy"
+        },
+        ["Environmental activists"] = new string[]
+        {
+            "green", "mindful", "brave", "eco-friendly"
+        },
+        ["Programmers"] = new string[]
+        {
+            "smart", "tired", "lazy"
+        },
+        ["Bookworms"] = new string[]
+        {
+            "interesting", "boring", "inspiring"
+        },
+        ["Gym bros"] = new string[]
+        {
+            "strong", "tough", "big", "muscular"
+        },
+        ["Gamers"] = new string[]
+        {
+            "nerdy", "skilled", "lonely"
+        },
+        ["Foodies"] = new string[]
+        {
+            "fat", "delicious", "yummy", "smelly"
+        },
+        ["Entrepreneurs"] = new string[]
+        {
+            "rich", "poor", "nervous", "generous", "smart", "pushing"
+        },
+        ["Artist"] = new string[]
+        {
+            "creative", "inspiring", "talented", "beautiful", "amazing"
+        },
+        ["Students"] = new string[]
+        {
+            "young", "smart", "hard", "cheerful", "curious", "poor"
+        },
+    };
+    public string[] jokes = { "Why did the /oa /n /v ? Because /a /n !", "dasda" };
     public AudioManager audioManager;
     public Animator cameraAnimator;
     public string finishedJoke;
+    public TMP_Text auditoryText;
     //public const Dictionary<string, string[]> themedNouns;
 
     public bool isDraggingBlock = false;
@@ -61,21 +275,97 @@ public class SceneLogic : MonoBehaviour
 
     public void InitializeJoke()
     {
+        audience = audiences[Random.Range(0, audiences.Length)];
+        auditoryText.text = audience;
         cameraAnimator.SetBool("IsZoomed", true);
         monologueBoxText.text = "";
         finishedJoke = "";
-        string joke = "Why did the /oa /n /v ? Because /a /n !";
+        string joke = jokes[Random.Range(0, jokes.Count())];
         StartCoroutine(NewJoke(joke));
     }
 
     public void CreateWordPool()
     {
-        string[] nounWords = { "dog", "man", "house", "depression", "moon", "parents", "bike", "chicken nuggets" };
-        string[] verbWords = { "burn", "die", "survive", "obey", "ask", "freeze", "study", "do", "make" };
-        string[] adjectiveWords = { "very", "hot", "burning", "stupid", "democratic", "dark", "absurd", "dying", "laughing" };
-        InstantiateBlockSlots(nounWordsContainer, ref nounWordBlocks, nounWords, nounBlockPrefab, 1);
-        InstantiateBlockSlots(verbWordsContainer, ref verbWordBlocks, verbWords, verbBlockPrefab, 2);
-        InstantiateBlockSlots(adjectiveWordsContainer, ref adjectiveWordBlocks, adjectiveWords, adjectiveBlockPrefab, 3);
+        List<string> nouns = new List<string>();
+        List<string> verbs = new List<string>();
+        List<string> adjectives = new List<string>();
+
+        int nounIndex = Random.Range(0, nounWords[audience].Count());
+
+        nouns.Add(nounWords[audience][nounIndex]);
+
+        int newNounIndex = Random.Range(0, nounWords[audience].Count());
+        while (newNounIndex == nounIndex)
+        {
+            newNounIndex = Random.Range(0, nounWords[audience].Count());
+        }
+        nouns.Add(nounWords[audience][newNounIndex]);
+
+        for(int i = 0; i < 8; i++)
+        {
+            string randomAuditory = audiences[Random.Range(0, audience.Count())];
+
+            nouns.Add(nounWords[randomAuditory]
+                [
+                Random.Range(0, nounWords[randomAuditory].Count())
+                ]);
+        }
+
+
+        int verbIndex = Random.Range(0, verbWords[audience].Count());
+
+        verbs.Add(verbWords[audience][verbIndex]);
+
+        int newVerbIndex = Random.Range(0, verbWords[audience].Count());
+        while (newVerbIndex == verbIndex)
+        {
+            newVerbIndex = Random.Range(0, verbWords[audience].Count());
+        }
+        verbs.Add(verbWords[audience][newVerbIndex]);
+
+        for (int i = 0; i < 8; i++)
+        {
+            string randomAuditory = audiences[Random.Range(0, audience.Count())];
+
+            verbs.Add(verbWords[randomAuditory]
+                [
+                Random.Range(0, verbWords[randomAuditory].Count())
+                ]);
+        }
+
+        int adjectiveIndex = Random.Range(0, adjectiveWords[audience].Count());
+
+        adjectives.Add(adjectiveWords[audience][adjectiveIndex]);
+
+        int newAdjectiveIndex = Random.Range(0, adjectiveWords[audience].Count());
+        while (newAdjectiveIndex == adjectiveIndex)
+        {
+            newAdjectiveIndex = Random.Range(0, adjectiveWords[audience].Count());
+        }
+        adjectives.Add(adjectiveWords[audience][newAdjectiveIndex]);
+
+        for (int i = 0; i < 8; i++)
+        {
+            string randomAuditory = audiences[Random.Range(0, audience.Count())];
+
+            adjectives.Add(adjectiveWords[randomAuditory]
+                [
+                Random.Range(0, adjectiveWords[randomAuditory].Count())
+                ]);
+        }
+
+
+        verbs.Add(verbWords[audience][Random.Range(0, verbWords[audience].Count())]);
+        verbs.Add(verbWords[audience][Random.Range(0, verbWords[audience].Count())]);
+
+        adjectives.Add(adjectiveWords[audience][Random.Range(0, adjectiveWords[audience].Count())]);
+        adjectives.Add(adjectiveWords[audience][Random.Range(0, adjectiveWords[audience].Count())]);
+
+
+
+        InstantiateBlockSlots(nounWordsContainer, ref nounWordBlocks, nouns.ToArray(), nounBlockPrefab, 1);
+        InstantiateBlockSlots(verbWordsContainer, ref verbWordBlocks, verbs.ToArray(), verbBlockPrefab, 2);
+        InstantiateBlockSlots(adjectiveWordsContainer, ref adjectiveWordBlocks, adjectives.ToArray(), adjectiveBlockPrefab, 3);
     }
 
     public IEnumerator NewJoke(string joke)
@@ -269,6 +559,27 @@ public class SceneLogic : MonoBehaviour
             if(block.tag == "Slot" && block.GetComponent<SlotScript>().attachedBlock != null)
             {
                 finishedJoke += block.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().text + " ";
+                if (block.GetComponent<SlotScript>().type == 1)
+                {
+                    if (nounWords[audience].Contains(block.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().text))
+                    {
+                        score++;
+                    }
+                }
+                if (block.GetComponent<SlotScript>().type == 2)
+                {
+                    if (verbWords[audience].Contains(block.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().text))
+                    {
+                        score++;
+                    }
+                }
+                if (block.GetComponent<SlotScript>().type == 3)
+                {
+                    if (adjectiveWords[audience].Contains(block.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().text))
+                    {
+                        score++;
+                    }
+                }
             }
             else if (block.tag != "Slot")
             {
@@ -347,7 +658,18 @@ public class SceneLogic : MonoBehaviour
         }
         audioManager.audioSource.pitch = 1;
         audioManager.PlaySound("badumts");
-        CrowdGoodReaction();
+        if(score <= 1)
+        {
+            CrowdBadReaction();
+        }
+        if (score == 2)
+        {
+            CrowdNeutralReaction();
+        }
+        if (score >= 3)
+        {
+            CrowdGoodReaction();
+        }
         yield return new WaitForSeconds(2f);
         interfaceAnimator.SetBool("MonologueBoxOpen", false);
     }

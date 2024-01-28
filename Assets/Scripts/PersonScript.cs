@@ -15,7 +15,7 @@ public class PersonScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        int material = Random.Range(1, 7);
+        int material = Random.Range(1, 8);
         MeshRenderer mesh = transform.GetChild(0).GetComponent<MeshRenderer>();
         switch(material)
         {
@@ -41,6 +41,7 @@ public class PersonScript : MonoBehaviour
                 mesh.material = material7;
                 break;
         }
+        StartCoroutine(Idle());
     }
 
     // Update is called once per frame
@@ -52,5 +53,10 @@ public class PersonScript : MonoBehaviour
     {
         yield return new WaitForSeconds(Random.Range(0f,1f));
         animator.SetTrigger("Jump");
+    }
+    public IEnumerator Idle()
+    {
+        yield return new WaitForSeconds(Random.Range(0f, 1f));
+        animator.SetTrigger("Idle");
     }
 }
