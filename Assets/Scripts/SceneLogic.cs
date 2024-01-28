@@ -245,7 +245,7 @@ public class SceneLogic : MonoBehaviour
             "young", "smart", "hard", "cheerful", "curious", "poor"
         },
     };
-    private string[] jokes = { "Why did the /oa /n /v ? Because the /n is a /n !", "Knock! Knock! Who is there? /oa /n", "What do you call a /a /n ? /oa /n !", "Why do I like to /v ? Because it's /a !", "What is the best /n ? A /a /n !", "How to /v ? I don't know, you better ask /oa /n !", "What did /oa /n say to /oa /n ? /v !" };
+    private string[] jokes = { "Why did the /oa /n /v ? Because the /n is a /n !", "Knock! Knock! Who is there? /oa /n !", "What do you call a /a /n ? /oa /n !", "Why do I like to /v ? Because it's /a !", "What is the best /n ? A /a /n !", "How to /v ? I don't know, you better ask /oa /n !", "What did /oa /n say to /oa /n ? /v !" };
     public AudioManager audioManager;
     public Animator cameraAnimator;
     public string finishedJoke;
@@ -276,6 +276,7 @@ public class SceneLogic : MonoBehaviour
 
     public void InitializeJoke()
     {
+        score = 0;
         audience = audiences[Random.Range(0, audiences.Length)];
         auditoryText.text = audience;
         cameraAnimator.SetBool("IsZoomed", true);
