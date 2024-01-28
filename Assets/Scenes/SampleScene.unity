@@ -236,7 +236,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -689.6, y: 448.25}
+  m_AnchoredPosition: {x: -689.6, y: 600}
   m_SizeDelta: {x: 500, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &52294539
@@ -3641,9 +3641,6 @@ MonoBehaviour:
   interfaceAnimator: {fileID: 1878289723}
   jokePanelScript: {fileID: 1777129967}
   score: 0
-  jokes:
-  - Why did the /oa /n /v ? Because /a /n !
-  - dasda
   audioManager: {fileID: 963194229}
   cameraAnimator: {fileID: 963194231}
   finishedJoke: 

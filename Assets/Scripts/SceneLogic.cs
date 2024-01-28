@@ -1,4 +1,3 @@
-using OpenCover.Framework.Model;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +8,6 @@ using System.Security.Principal;
 using System.Text.RegularExpressions;
 using TMPro;
 using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SocialPlatforms.Impl;
@@ -245,7 +242,7 @@ public class SceneLogic : MonoBehaviour
             "young", "smart", "hard", "cheerful", "curious", "poor"
         },
     };
-    private string[] jokes = { "Why did the /oa /n /v ? Because the /n is a /n !", "Knock! Knock! Who is there? /oa /n !", "What do you call a /a /n ? /oa /n !", "Why do I like to /v ? Because it's /a !", "What is the best /n ? A /a /n !", "How to /v ? I don't know, you better ask /oa /n !", "What did /oa /n say to /oa /n ? /v !" };
+    private string[] jokes = { "Why did the /oa /n /v ? Because the /n is a /n !", "Knock! Knock! Who is there? /oa /n !", "What do you call a /a /n ? /oa /n !", "Why do I like to /v ? Because it's /a !", "What is the best /n ? A /a /n !", "How to /v ? I don't know, you better ask /oa /n !", "What did /oa /n say to /oa /n ? /v !", "Why does /oa /n like to /v ? It just thinks it's too /a for that!" };
     public AudioManager audioManager;
     public Animator cameraAnimator;
     public string finishedJoke;
