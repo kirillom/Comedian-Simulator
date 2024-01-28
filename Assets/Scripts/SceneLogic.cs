@@ -245,7 +245,7 @@ public class SceneLogic : MonoBehaviour
             "young", "smart", "hard", "cheerful", "curious", "poor"
         },
     };
-    public string[] jokes = { "Why did the /oa /n /v ? Because /a /n !", "dasda" };
+    private string[] jokes = { "Why did the /oa /n /v ? Because the /n is a /n !", "Knock! Knock! Who is there? /oa /n", "What do you call a /a /n ? /oa /n !", "Why do I like to /v ? Because it's /a !", "What is the best /n ? A /a /n !", "How to /v ? I don't know, you better ask /oa /n !", "What did /oa /n say to /oa /n ? /v !" };
     public AudioManager audioManager;
     public Animator cameraAnimator;
     public string finishedJoke;
@@ -256,6 +256,7 @@ public class SceneLogic : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        InitializeJoke();
     }
 
     // Update is called once per frame
@@ -264,7 +265,7 @@ public class SceneLogic : MonoBehaviour
         Application.targetFrameRate = fps;
         if(Input.GetKeyDown(KeyCode.R))
         {
-            InitializeJoke();
+            
         }
 
         if(isDraggingBlock)
@@ -672,6 +673,7 @@ public class SceneLogic : MonoBehaviour
         }
         yield return new WaitForSeconds(2f);
         interfaceAnimator.SetBool("MonologueBoxOpen", false);
+        InitializeJoke();
     }
 
     public void CrowdBadReaction()
