@@ -27,6 +27,7 @@ public class SceneLogic : MonoBehaviour
     public GameObject verbBlockPrefab;
     public GameObject adjectiveBlockPrefab;
     public GameObject blockOriginPrefab;
+    public GameObject crowd;
     public TMP_Text monologueBoxText;
     public Animator wordsPanelAnimator;
     public Animator interfaceAnimator;
@@ -80,6 +81,7 @@ public class SceneLogic : MonoBehaviour
     public IEnumerator NewJoke(string joke)
     {
         yield return new WaitForSeconds(3);
+        audioManager.CrowdSpeaking();
         mainInterface.GetComponent<InterfaceScript>().appearAnimPlaying = true;
         //string joke = "What did the \0 say to the \0 ? \0 !";
         //Why didn't the n v ? Because n didn't know how to v !
@@ -235,7 +237,8 @@ public class SceneLogic : MonoBehaviour
     {
         for (int i = 0; i < wordBlocks.Count; i++)
         {
-            yield return new WaitForSeconds(0.1f);
+            audioManager.PlaySound("xylophone", 0.1f);
+            yield return new WaitForSeconds(0.15f);
             GameObject origin = wordBlocks[i];
             if (i == 0)
             {
@@ -255,6 +258,7 @@ public class SceneLogic : MonoBehaviour
             GameObject block = Instantiate(blockPrefab, origin.transform.position, new Quaternion(0, 0, 0, 0), container.transform);
             block.GetComponent<BlockScript>().Initialize(origin.transform.GetChild(1).GetComponent<TMP_Text>().text, container, blockPanel, mainInterface, this, origin, type);
         }
+        audioManager.audioSource.pitch = 1;
         mainInterface.GetComponent<InterfaceScript>().appearAnimPlaying = false;
     }
 
@@ -271,6 +275,8 @@ public class SceneLogic : MonoBehaviour
                 finishedJoke += block.GetComponent<TMP_Text>().text + " ";
             }
         }
+        StartCoroutine(audioManager.CrowdStop());
+        audioManager.PlaySound("done");
         interfaceAnimator.SetBool("ActivePanel", false);
         cameraAnimator.SetBool("IsZoomed", false);
         StartCoroutine(Purge());
@@ -307,7 +313,7 @@ public class SceneLogic : MonoBehaviour
     }
     IEnumerator SayJoke(string joke)
     {
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(3);
         interfaceAnimator.SetBool("MonologueBoxOpen", true);
         yield return new WaitForSeconds(0.5f);
         int i = 0;
@@ -341,7 +347,16 @@ public class SceneLogic : MonoBehaviour
         }
         audioManager.audioSource.pitch = 1;
         audioManager.PlaySound("badumts");
+        CrowdGoodReaction();
         yield return new WaitForSeconds(2f);
         interfaceAnimator.SetBool("MonologueBoxOpen", false);
+    }
+
+    public void CrowdGoodReaction()
+    {
+        foreach(Transform person in crowd.transform)
+        {
+            StartCoroutine(person.gameObject.GetComponent<PersonScript>().Jump());
+        }
     }
 }

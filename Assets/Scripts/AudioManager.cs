@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements.Experimental;
 
 public class AudioManager : MonoBehaviour
 {
@@ -25,5 +26,21 @@ public class AudioManager : MonoBehaviour
     public void PlaySound(string sound, float volume)
     {
         audioSource.PlayOneShot(Resources.Load<AudioClip>("Sounds/" + sound), volume);
+    }
+
+    public void CrowdSpeaking()
+    {
+        audioSource.volume = 1;
+        audioSource.Play();
+    }
+    public IEnumerator CrowdStop()
+    {
+        while(audioSource.volume > 0)
+        {
+            audioSource.volume -= 0.01f;
+            yield return new WaitForEndOfFrame();
+        }
+        audioSource.Stop();
+        audioSource.volume = 1;
     }
 }
