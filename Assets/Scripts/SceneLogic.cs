@@ -5,6 +5,7 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+//using static System.Net.Mime.MediaTypeNames;
 
 public class SceneLogic : MonoBehaviour
 {
@@ -26,12 +27,14 @@ public class SceneLogic : MonoBehaviour
     public GameObject verbBlockPrefab;
     public GameObject adjectiveBlockPrefab;
     public GameObject blockOriginPrefab;
+    public TMP_Text monologueBoxText;
     public Animator wordsPanelAnimator;
     public Animator interfaceAnimator;
     public JokePanelScript jokePanelScript;
     public string[] audiences = { "teenagers", "teachers", "bikers", "" };
     public AudioManager audioManager;
     public Animator cameraAnimator;
+    public string finishedJoke;
     //public const Dictionary<string, string[]> themedNouns;
 
     public bool isDraggingBlock = false;
@@ -58,6 +61,8 @@ public class SceneLogic : MonoBehaviour
     public void InitializeJoke()
     {
         cameraAnimator.SetBool("IsZoomed", true);
+        monologueBoxText.text = "";
+        finishedJoke = "";
         string joke = "Why did the /oa /n /v ? Because /a /n !";
         StartCoroutine(NewJoke(joke));
     }
@@ -77,6 +82,7 @@ public class SceneLogic : MonoBehaviour
         yield return new WaitForSeconds(3);
         mainInterface.GetComponent<InterfaceScript>().appearAnimPlaying = true;
         //string joke = "What did the \0 say to the \0 ? \0 !";
+        //Why didn't the n v ? Because n didn't know how to v !
         string[] separatedWords = joke.Split(" ");
 
         interfaceAnimator.SetBool("ActivePanel", true);
@@ -148,12 +154,23 @@ public class SceneLogic : MonoBehaviour
                 if (destination.x + block.GetComponent<SegmentScript>().dimensions.x > 830)
                 {
                     destination = new Vector2(-830, destination.y - 70);
-                    block.GetComponent<SegmentScript>().destination = destination;
+                    //block.GetComponent<SegmentScript>().destination = destination;
                 }
                 if (destination.y < block.GetComponent<SegmentScript>().destination.y && !hasUppered)
                 {
-                    hasUppered = true;
-                    jokePanelScript.height += 70;
+                    bool isThereSimilar = false;
+                    foreach (GameObject gameObject in jokeBlocks)
+                    {
+                        if(gameObject.GetComponent<SegmentScript>().destination.y == destination.y)
+                        {
+                            isThereSimilar = true;
+                        }
+                    }
+                    if(!isThereSimilar)
+                    {
+                        hasUppered = true;
+                        jokePanelScript.height += 70;
+                    }
                 }
                 else if (destination.y > block.GetComponent<SegmentScript>().destination.y && !hasLowered)
                 {
@@ -243,9 +260,21 @@ public class SceneLogic : MonoBehaviour
 
     public void FinishJoke()
     {
+        foreach (GameObject block in jokeBlocks)
+        {
+            if(block.tag == "Slot" && block.GetComponent<SlotScript>().attachedBlock != null)
+            {
+                finishedJoke += block.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().text + " ";
+            }
+            else if (block.tag != "Slot")
+            {
+                finishedJoke += block.GetComponent<TMP_Text>().text + " ";
+            }
+        }
         interfaceAnimator.SetBool("ActivePanel", false);
         cameraAnimator.SetBool("IsZoomed", false);
         StartCoroutine(Purge());
+        StartCoroutine(SayJoke(finishedJoke));
         jokeBlocks.Clear();
         nounWordBlocks.Clear();
         verbWordBlocks.Clear();
@@ -275,5 +304,44 @@ public class SceneLogic : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+    }
+    IEnumerator SayJoke(string joke)
+    {
+        yield return new WaitForSeconds(2);
+        interfaceAnimator.SetBool("MonologueBoxOpen", true);
+        yield return new WaitForSeconds(0.5f);
+        int i = 0;
+        string result = "";
+        int soundIterator = 0;
+        while (i < joke.Length)
+        {
+            if (joke[i] == '?' || joke[i] == '.' || joke[i] == ',')
+            {
+                result += joke[i];
+                i++;
+                monologueBoxText.text = result;
+                yield return new WaitForSeconds(1f);
+            }
+            else
+            {
+                result += joke[i];
+                i++;
+            }
+            if(soundIterator == 0)
+            {
+                audioManager.PlaySound("speech", 0.2f);
+                audioManager.audioSource.pitch = Random.Range(0.5f, 0.8f);
+            }
+            soundIterator++;
+            if (soundIterator > 2) soundIterator = 0;
+            
+            monologueBoxText.text = result;
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+        }
+        audioManager.audioSource.pitch = 1;
+        audioManager.PlaySound("badumts");
+        yield return new WaitForSeconds(2f);
+        interfaceAnimator.SetBool("MonologueBoxOpen", false);
     }
 }

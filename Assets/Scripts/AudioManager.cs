@@ -22,4 +22,8 @@ public class AudioManager : MonoBehaviour
     {
         audioSource.PlayOneShot(Resources.Load<AudioClip>("Sounds/" + sound));
     }
+    public void PlaySound(string sound, float volume)
+    {
+        audioSource.PlayOneShot(Resources.Load<AudioClip>("Sounds/" + sound), volume);
+    }
 }
