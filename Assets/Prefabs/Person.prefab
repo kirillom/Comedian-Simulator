@@ -213,6 +213,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8f19b50dfa88594abef6b244fc38b66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  material1: {fileID: 2100000, guid: ab963cdc09a7e134daa922101ba6af4a, type: 2}
+  material2: {fileID: 2100000, guid: 678075b81d8f7fb44a189ebd9165896a, type: 2}
+  material3: {fileID: 2100000, guid: 0dd4e700e71f3c1469109b7a96787ced, type: 2}
+  material4: {fileID: 2100000, guid: 963b822b743524248ad41fc646705943, type: 2}
+  material5: {fileID: 2100000, guid: cb1f885b19f55654aad098b90fb82cca, type: 2}
+  material6: {fileID: 2100000, guid: 19f8ed073495c1f4fbcac0c7d285f2a3, type: 2}
+  material7: {fileID: 2100000, guid: 3237d8f757eebf34a848a944945f0151, type: 2}
   animator: {fileID: 8219147388089770687}
 --- !u!95 &8219147388089770687
 Animator:

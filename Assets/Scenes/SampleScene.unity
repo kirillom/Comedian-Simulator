@@ -20,7 +20,7 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.745283, g: 0.745283, b: 0.745283, a: 1}
+  m_AmbientSkyColor: {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
@@ -3424,6 +3424,7 @@ MonoBehaviour:
   verbBlockPrefab: {fileID: 2351990447032327026, guid: 1bee08aadf3dee242a7e5730431d1c22, type: 3}
   adjectiveBlockPrefab: {fileID: 2351990447032327026, guid: b3e56d1161bea7b46b4404df3d434fd6, type: 3}
   blockOriginPrefab: {fileID: 2351990447032327026, guid: 2a07d87760ddc1b4aa718e3da21f76cd, type: 3}
+  crowd: {fileID: 220302157}
   monologueBoxText: {fileID: 776144319}
   wordsPanelAnimator: {fileID: 334769972}
   interfaceAnimator: {fileID: 1878289723}
@@ -5382,11 +5383,11 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_audioClip: {fileID: 8300000, guid: 00aa725211857e340a3b630a95da0f53, type: 3}
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -8479,7 +8480,7 @@ Light:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 5.4
   m_Range: 75
-  m_SpotAngle: 50
+  m_SpotAngle: 87
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
@@ -8535,13 +8536,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1709743370}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.25206935, y: 0, z: 0, w: 0.9677092}
-  m_LocalPosition: {x: 0, y: 26.97, z: -28.99}
+  m_LocalRotation: {x: 0, y: 0.9075577, z: -0.4199274, w: 0}
+  m_LocalPosition: {x: 0, y: 26.97, z: 25.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 29.2, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 49.66, y: 180, z: 0}
 --- !u!1 &1715592889
 GameObject:
   m_ObjectHideFlags: 0
