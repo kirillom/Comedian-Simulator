@@ -74,7 +74,7 @@ public class InterfaceScript : MonoBehaviour
 
     public void PanelAppearAnimEnd()
     {
-        sceneLogic.CreateWordPool();
+        sceneLogic.InitializeBlockSlots();
     }
     public void PanelDisappearAnimEnd()
     {
