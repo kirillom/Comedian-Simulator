@@ -28,7 +28,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     private bool isDragging = false;
     public bool isMoving = false;
     public Vector3 globalPosition;
-    public Vector3 destination;
+    public Vector3 destination = Vector3.zero;
     public Vector3 velocity;
     public float width;
     public float speed;
@@ -200,6 +200,8 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             if (slot.GetComponent<SlotScript>().attachedBlock != null)
             {
                 Destroy(slot.GetComponent<SlotScript>().attachedBlock);
+                sceneLogic.audioManager.PlaySound("swap");
+                playSound = false;
             }
         }
         else

@@ -39,76 +39,56 @@ public class SceneLogic : MonoBehaviour
     public JokePanelScript jokePanelScript;
     string audience;
     public float score;
-    private string[] audiences = { "Teenagers", "Teachers", "Vegeterians", "Parents", "Old people", "Children", "Pet lovers", "Environmental activists", "Programmers", "Bookworms", "Gym bros", "Gamers", "Foodies", "Entrepreneurs", "Artists", "Students", "General" };
+    private string[] audiences = { "Teenagers", "Parents", "Children", "Pet lovers", "Conservationists", "Programmers", "Gym bros", "Gamers", "Foodies", "Artists", "Students", "General" };
     Dictionary<string, string[]> nounWords = new Dictionary<string, string[]>
     {
         ["General"] = new string[]
         {
-            "girl", "boy", "god", "woman", "man"
+            "girl", "boy", "god", "woman", "man", "human"
         },
-        ["Teenagers"] = new string[] 
+        ["Teenagers"] = new string[]
         {
-            "teenager", "best friend", "first love", "mom", "dad", "nerd"
-        },
-        ["Teachers"] = new string[]
-        {
-            "student", "workbook", "principal", "teacher"
-        },
-        ["Vegeterians"] = new string[]
-        {
-            "food", "apple", "grass", "chicken"
+            "teenager", "best friend", "first love", "chick"
         },
         ["Parents"] = new string[]
         {
             "child", "son", "daughter", "husband", "wife"
         },
-        ["Old people"] = new string[]
-        {
-            "grandpa", "grandma", "man", "grandchild"
-        },
         ["Children"] = new string[]
         {
-            "mom", "dad", "dinosaur", "candy", "baby", "child"
+            "mommy", "daddy", "dinosaur", "baby", "child", "best friend"
         },
         ["Pet lovers"] = new string[]
         {
-            "cat", "dog", "dog toys", "parrot", "cow"
+            "cat", "dog", "parrot", "hamster", "horse"
         },
-        ["Environmental activists"] = new string[]
+        ["Conservationists"] = new string[]
         {
-            "grass", "tree", "garbage", "trash", "trash bin", "climate"
+            "trash bin", "environmental activist", "vegeterian"
         },
         ["Programmers"] = new string[]
         {
-            "computer", "iphone", "Elon Mask", "mouse", "deadline", "code"
-        },
-        ["Bookworms"] = new string[]
-        {
-            "book", "librarian", "main character", "joke"
+            "Elon Mask", "programmer", "project lead", "boss", "junior guy"
         },
         ["Gym bros"] = new string[]
         {
-            "protein", "gym", "gym bro", "steroids", "sis", "man", ""
+            "gym bro", "sis", "man", "bro"
         },
         ["Gamers"] = new string[]
         {
-            "gamer", "Mario", "Dota 2", "discord mod", "tryharder"
+            "gamer", "Mario", "Dota 2", "discord mod", "tryharder", "noob"
         },
         ["Foodies"] = new string[]
         {
-            "food", "chicken nuggets", "fries", "pizza", "burger", "chips", "fish", "chicken"
-        },
-        ["Entrepreneurs"] = new string[]
-        {
-            "money", "principal", "boss", "team", "leader"
+            "chicken nugget", "pizza", "fish", "chicken"
         },
         ["Artists"] = new string[]
         {
-            "artist", "paint", "painting", "van Gogh", "god"
+            "artist", "van Gogh", "god"
         },
         ["Students"] = new string[]
         {
-            "school", "teacher", "professor", "scientist", "lesson", "workbook", "textbook", "homework"
+            "teacher", "professor", "scientist", "nerd", "principal"
         },
     };
     Dictionary<string, string[]> verbWords = new Dictionary<string, string[]>
@@ -119,43 +99,27 @@ public class SceneLogic : MonoBehaviour
         },
         ["Teenagers"] = new string[]
         {
-            "fall in love", "get depressed", "swear uncontrollably", "bully kids", "hang out", "fall into existential crisis", "take copium", "get drunk", "rizz the skibidi baka in Ohio"
-        },
-        ["Teachers"] = new string[]
-        {
-            "teach", "shout", "ask a question", "assign a homework"
-        },
-        ["Vegeterians"] = new string[]
-        {
-            "eat", "meditate", "photosynthesize"
+            "fall in love", "get depressed", "swear uncontrollably", "bully kids", "hang out", "fall into existential crisis", "get drunk", "rizz the skibidi baka in Ohio"
         },
         ["Parents"] = new string[]
         {
-            "sleep well", "go on a vacation"
-        },
-        ["Old people"] = new string[]
-        {
-            "die", "get old", "complain about today's news", "grumble"
+            "sleep well", "go on a vacation", "complain about today's news"
         },
         ["Children"] = new string[]
         {
-            "play", "laugh", "cry", "yell", "eat sweets"
+            "play with dolls", "laugh uncontrollably", "cry without a reason", "yell at people"
         },
         ["Pet lovers"] = new string[]
         {
-            "pet", "walk", "hug"
+            "pet", "go on a walk", "hug"
         },
-        ["Environmental activists"] = new string[]
+        ["Conservationists"] = new string[]
         {
-            "protest", "protect nature", "plant a tree"
+            "protest", "meditate", "photosynthesize", "hibernate"
         },
         ["Programmers"] = new string[]
         {
-            "work 24/7", "chill", "code"
-        },
-        ["Bookworms"] = new string[]
-        {
-            "read books", "drink tea", "be quiet"
+            "work 24/7", "chill with friends", "hack pentagon", "go on a vacation", "drink too much coffee"
         },
         ["Gym bros"] = new string[]
         {
@@ -163,15 +127,11 @@ public class SceneLogic : MonoBehaviour
         },
         ["Gamers"] = new string[]
         {
-            "play games", "drink energy drinks", "stream games", "go outside", "touch grass", "get good", "score an ace", "try hard"
+            "go outside", "touch grass", "get good", "take copium", "snipe people"
         },
         ["Foodies"] = new string[]
         {
-            "eat", "cook", "make a picnic"
-        },
-        ["Entrepreneurs"] = new string[]
-        {
-            "make money", "call a meeting", "work 24/7", "drink a lot of coffee"
+            "eat too much", "cook pasta", "make a picnic"
         },
         ["Artists"] = new string[]
         {
@@ -190,43 +150,27 @@ public class SceneLogic : MonoBehaviour
         },
         ["Teenagers"] = new string[]
         {
-            "young", "emotionally unstable", "edgy", "depressed", "freaking"
-        },
-        ["Teachers"] = new string[]
-        {
-            "boring", "angry", "loud"
-        },
-        ["Vegeterians"] = new string[]
-        {
-            "green", "healthy", "hungry"
+            "young", "emotionally unstable", "edgy", "depressed", "freaking", "hot"
         },
         ["Parents"] = new string[]
         {
-            "tired", "loving", "caring"
-        },
-        ["Old people"] = new string[]
-        {
-            "tired", "sick", "wise", "calm"
+            "loving", "caring", "wise", "calm"
         },
         ["Children"] = new string[]
         {
-            "cute", "loud", "pink", "small", "playful", "sweet"
+            "cute", "pink", "small", "playful"
         },
         ["Pet lovers"] = new string[]
         {
             "playful", "cute", "fluffy", "squishy"
         },
-        ["Environmental activists"] = new string[]
+        ["Conservationists"] = new string[]
         {
-            "green", "carbon-neutral", "eco-friendly", "burning"
+            "green", "carbon-neutral", "eco-friendly", "burning", "dying"
         },
         ["Programmers"] = new string[]
         {
             "smart", "exhausted"
-        },
-        ["Bookworms"] = new string[]
-        {
-            "interesting", "boring", "inspiring"
         },
         ["Gym bros"] = new string[]
         {
@@ -234,26 +178,22 @@ public class SceneLogic : MonoBehaviour
         },
         ["Gamers"] = new string[]
         {
-            "nerdy", "skilled", "lonely"
+            "nerdy", "skilled", "top"
         },
         ["Foodies"] = new string[]
         {
-            "fat", "delicious", "yummy", "smelly"
-        },
-        ["Entrepreneurs"] = new string[]
-        {
-            "rich", "poor", "nervous", "generous", "smart", "pushing"
+            "fat", "delicious", "smelly", "hot"
         },
         ["Artists"] = new string[]
         {
-            "creative", "inspiring", "talented", "beautiful", "amazing"
+            "talented", "beautiful", "amazing"
         },
         ["Students"] = new string[]
         {
-            "smart", "hard", "poor"
+            "smart", "poor", "boring"
         },
     };
-    private string[] jokes = { "Knock! Knock! Who is there? /oa /n !", "What do you call a /a /n ? /oa /n !", "Why do I like to /v ? Because it's /a !", "What is the best /n ? A /a /n !", "How to /v ? I don't know, you better ask /oa /n !", "What did /oa /n say to /oa /n ? \"Hey, you should /v !\"", "Why doesn't /oa /n like to /v ? They just thinks they're too /a for that!", "How to make the /oa /n /v ? Just bet they won't do it.", "One time I shouted \"Let's /v !!\" in public and the /oa /n beat me up.", "You know what? I'm just gonna admit it - I absolutely love " };
+    private string[] jokes = { "Knock-knock! Who is there? It's me, /oa /n !", "What do you call a /a /n ? A /oa /n !", "Why do I like to /v ? Because it makes me /a !", "What is the best /n ? A /a /n !", "How to /v properly? I don't know, you better ask /oa /n !", "What did the /oa /n say to the /oa /n ? \"Hey, you should /v !\"", "Why doesn't the /oa /n like to /v ? They just think they're too /a for that!", "How to make a /oa /n /v ? Just bet they won't do it.", "One time I yelled \"Let's /v !!\" in public and the /oa /n beat me up.", "Yesterday I met a /oa /n and I couldn't stop thinking about them since. Could anybody share some dating advices?", "If only you knew how hard it is to live with a /oa /n ! They are always trying to /v !", "My job may be hard but it always warms my heart to know there's a /oa /n waiting for me at home." };
     public AudioManager audioManager;
     public Animator cameraAnimator;
     public string finishedJoke;
@@ -388,7 +328,6 @@ public class SceneLogic : MonoBehaviour
                 newSlot.GetComponent<SlotScript>().index = jokeBlocks.Count - 1;
                 newSlot.transform.GetChild(0).GetComponent<RawImage>().color = newSlot.transform.GetChild(1).GetComponent<Image>().color = newSlot.transform.GetChild(2).GetComponent<Image>().color = new Color(57f / 255f, 87f / 255f, 168f / 255f, 1);
                 newSlot.GetComponent<SlotScript>().type = 3;
-                newSlot.GetComponent<SlotScript>().optional = true;
             }
             else
             {
@@ -418,7 +357,10 @@ public class SceneLogic : MonoBehaviour
             else
             {
                 Vector2 previousBlockPos = jokeBlocks[i - 1].GetComponent<SegmentScript>().destination;
-
+                if(block.GetComponent<SegmentScript>().destination == Vector3.zero)
+                {
+                    block.GetComponent<SegmentScript>().destination = new Vector2(-830, 130);
+                }
                 destination = new Vector2(previousBlockPos.x + jokeBlocks[i - 1].GetComponent<SegmentScript>().dimensions.x + 15, previousBlockPos.y);
 
                 if (destination.x + block.GetComponent<SegmentScript>().dimensions.x > 830)
@@ -433,10 +375,7 @@ public class SceneLogic : MonoBehaviour
                         hasUppered = true;
                         jokePanelScript.height += 70;
                     }
-                }
-                if (i == jokeBlocks.Count - 1)
-                {
-                    if (destination.y > block.GetComponent<SegmentScript>().destination.y)
+                    else if (destination.y > block.GetComponent<SegmentScript>().destination.y)
                     {
                         hasLowered = true;
                         jokePanelScript.height -= 70;
@@ -534,6 +473,7 @@ public class SceneLogic : MonoBehaviour
             if(block.tag == "Slot" && block.GetComponent<SlotScript>().attachedBlock != null)
             {
                 finishedJoke += block.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().text + " ";
+                block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().isMoving = false;
                 CalculateScore(block);
                 blocksCount++;
             }
@@ -582,7 +522,7 @@ public class SceneLogic : MonoBehaviour
     IEnumerator Purge()
     {
         yield return new WaitForSeconds(1);
-        jokePanelScript.height = 20;
+        jokePanelScript.height = -50;
         foreach (Transform child in nounWordsContainer.transform)
         {
             Destroy(child.gameObject);
@@ -614,17 +554,27 @@ public class SceneLogic : MonoBehaviour
         int soundIterator = 0;
         while (i < joke.Length)
         {
-            if (joke[i] == '?' || joke[i] == '.' || joke[i] == ',')
+            if (joke[i] == '?' || joke[i] == '.' || joke[i] == '!')
             {
                 result += joke[i];
                 i++;
                 monologueBoxText.text = result;
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(0.5f);
             }
-            else
+            else if (joke[i] == ',')
             {
                 result += joke[i];
                 i++;
+                monologueBoxText.text = result;
+                yield return new WaitForSeconds(0.2f);
+            }
+            else
+            {
+                if (!(joke[i] == ' ' && joke[i + 1] is '?' or '!' or '.' or ','))
+                {
+                    result += joke[i];
+                    i++;
+                }
             }
             if(soundIterator == 0)
             {

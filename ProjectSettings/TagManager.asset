@@ -5,8 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Scene Logic
-  - Moving Block
   - Slot
+  - Block
   layers:
   - Default
   - TransparentFX

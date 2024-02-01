@@ -245,6 +245,7 @@ MonoBehaviour:
   isSlotOptional: 0
   slot: {fileID: 459986069249013886}
   index: 0
+  type: 0
 --- !u!114 &6331166053400932493
 MonoBehaviour:
   m_ObjectHideFlags: 0

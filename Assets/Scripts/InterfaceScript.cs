@@ -37,6 +37,14 @@ public class InterfaceScript : MonoBehaviour
             currentPool++;
             if (currentPool > 3) currentPool = 1;
 
+            foreach(GameObject block in GameObject.FindGameObjectsWithTag("Block"))
+            {
+                if(block.GetComponent<BlockScript>().isMoving)
+                {
+                    block.GetComponent<BlockScript>().isMoving = false;
+                    block.transform.position = block.GetComponent<BlockScript>().destination;
+                }
+            }
             animator.SetInteger("ActivePool", currentPool);
             animator.SetTrigger("SwapButtonPressed");
         }
