@@ -193,7 +193,7 @@ public class SceneLogic : MonoBehaviour
             "smart", "poor", "boring"
         },
     };
-    private string[] jokes = { "Knock-knock! Who is there? It's me, /oa /n !", "What do you call a /a /n ? A /oa /n !", "Why do I like to /v ? Because it makes me /a !", "What is the best /n ? A /a /n !", "How to /v properly? I don't know, you better ask /oa /n !", "What did the /oa /n say to the /oa /n ? \"Hey, you should /v !\"", "Why doesn't the /oa /n like to /v ? They just think they're too /a for that!", "How to make a /oa /n /v ? Just bet they won't do it.", "One time I yelled \"Let's /v !!\" in public and the /oa /n beat me up.", "Yesterday I met a /oa /n and I couldn't stop thinking about them since. Could anybody share some dating advices?", "If only you knew how hard it is to live with a /oa /n ! They are always trying to /v !", "My job may be hard but it always warms my heart to know there's a /oa /n waiting for me at home." };
+    private string[] jokes = { "Knock-knock! Who is there? It's me, /oa /n !", "What do you call a /a /n ? A /oa /n !", "Why do I like to /v ? Because it makes me /a !", "What is the best /n ? A /a /n !", "How to /v properly? I don't know, you better ask /oa /n !", "What did the /oa /n say to the /oa /n ? \"Hey, you should /v !\"", "Why doesn't the /oa /n like to /v ? They just think they're too /a for that!", "How to make a /oa /n /v ? Just bet they won't do it.", "One time I yelled \"Let's /v !\" in public and a /oa /n beat me up.", "Yesterday I met a /oa /n and I couldn't stop thinking about them since. Could anybody share some dating advices?", "If only you knew how hard it is to live with a /oa /n ! They are always trying to /v !", "My job may be hard but it always warms my heart to know there's a /oa /n waiting for me at home." };
     public AudioManager audioManager;
     public Animator cameraAnimator;
     public string finishedJoke;
@@ -258,7 +258,7 @@ public class SceneLogic : MonoBehaviour
             result.Add(pendingWord);
         }
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 4; i++)
         {
             do
             {
@@ -552,7 +552,7 @@ public class SceneLogic : MonoBehaviour
         int i = 0;
         string result = "";
         int soundIterator = 0;
-        while (i < joke.Length)
+        while (i < joke.Length - 1)
         {
             if (joke[i] == '?' || joke[i] == '.' || joke[i] == '!')
             {
@@ -573,8 +573,8 @@ public class SceneLogic : MonoBehaviour
                 if (!(joke[i] == ' ' && joke[i + 1] is '?' or '!' or '.' or ','))
                 {
                     result += joke[i];
-                    i++;
                 }
+                i++;
             }
             if(soundIterator == 0)
             {
