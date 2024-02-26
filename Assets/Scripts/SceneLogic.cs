@@ -33,6 +33,7 @@ public class SceneLogic : MonoBehaviour
     public GameObject adjectiveBlockPrefab;
     public GameObject blockOriginPrefab;
     public GameObject crowd;
+    public RectTransform timebar;
     public TMP_Text monologueBoxText;
     public Animator wordsPanelAnimator;
     public Animator interfaceAnimator;
@@ -111,7 +112,7 @@ public class SceneLogic : MonoBehaviour
         },
         ["Pet lovers"] = new string[]
         {
-            "pet", "go on a walk", "hug"
+            "pet somebody without permission", "go on a walk", "hug animals"
         },
         ["Conservationists"] = new string[]
         {
@@ -123,34 +124,34 @@ public class SceneLogic : MonoBehaviour
         },
         ["Gym bros"] = new string[]
         {
-            "workout", "lift weights", "pump muscles", "get covered in oil", "flex"
+            "lift weights", "pump muscles", "get covered in oil", "flex", "take a shower"
         },
         ["Gamers"] = new string[]
         {
-            "go outside", "touch grass", "get good", "take copium", "snipe people"
+            "go outside", "touch grass", "get good", "take copium", "snipe people", "take a shower"
         },
         ["Foodies"] = new string[]
         {
-            "eat too much", "cook pasta", "make a picnic"
+            "eat too much", "cook pasta"
         },
         ["Artists"] = new string[]
         {
-            "go to museum", "paint", "create a masterpiece", "dream"
+            "go to museum", "create a masterpiece", "have weird dreams"
         },
         ["Students"] = new string[]
         {
-            "get drunk", "party", "bully kids", "study math", "skip a class"
+            "get drunk", "bully kids", "study math", "skip a class"
         },
     };
     Dictionary<string, string[]> adjectiveWords = new Dictionary<string, string[]>
     {
         ["General"] = new string[]
         {
-            "my", "your", "our", "feminine", "masculine", "non-binary"
+            "my", "your", "our", "feminine", "masculine", "non-binary", "popular"
         },
         ["Teenagers"] = new string[]
         {
-            "young", "emotionally unstable", "edgy", "depressed", "freaking", "hot"
+            "young", "emotionally unstable", "edgy", "depressed", "freaking", "hot", "popular"
         },
         ["Parents"] = new string[]
         {
@@ -239,6 +240,9 @@ public class SceneLogic : MonoBehaviour
         InstantiateBlockSlots(nounWordsContainer, ref nounWordBlocks, CreateWordPool(nounWords, audience), nounBlockPrefab, 1);
         InstantiateBlockSlots(verbWordsContainer, ref verbWordBlocks, CreateWordPool(verbWords, audience), verbBlockPrefab, 2);
         InstantiateBlockSlots(adjectiveWordsContainer, ref adjectiveWordBlocks, CreateWordPool(adjectiveWords, audience), adjectiveBlockPrefab, 3);
+
+        StartCoroutine(audioManager.CrowdSpeaking());
+        StartCoroutine(StartCountdown());
     }
 
     public string[] CreateWordPool(Dictionary<string, string[]> wordsDictionary, string audience)
@@ -288,7 +292,6 @@ public class SceneLogic : MonoBehaviour
     public IEnumerator NewJoke(string joke)
     {
         yield return new WaitForSeconds(3);
-        audioManager.CrowdSpeaking();
         mainInterface.GetComponent<InterfaceScript>().appearAnimPlaying = true;
         //string joke = "What did the \0 say to the \0 ? \0 !";
         //Why didn't the n v ? Because n didn't know how to v !
@@ -467,15 +470,35 @@ public class SceneLogic : MonoBehaviour
 
     public void FinishJoke()
     {
+        timebar.sizeDelta = timebar.sizeDelta;
+        finishedJoke = "";
         int blocksCount = 0;
         foreach (GameObject block in jokeBlocks)
         {
-            if(block.tag == "Slot" && block.GetComponent<SlotScript>().attachedBlock != null)
+            if(block.tag == "Slot")
             {
-                finishedJoke += block.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().text + " ";
-                block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().isMoving = false;
-                CalculateScore(block);
-                blocksCount++;
+                if(block.GetComponent<SlotScript>().attachedBlock != null)
+                {
+                    finishedJoke += block.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().text + " ";
+                    block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().isMoving = false;
+                    CalculateScore(block);
+                    blocksCount++;
+                }
+                else
+                {
+                    if (!block.GetComponent<SlotScript>().isSlotOptional)
+                    {
+                        audioManager.PlaySound("forbidden");
+                        foreach (GameObject _block in jokeBlocks)
+                        {
+                            if (_block.tag == "Slot" && !_block.GetComponent<SlotScript>().isSlotOptional && _block.GetComponent<SlotScript>().attachedBlock == null)
+                            {
+                                StartCoroutine(_block.GetComponent<SlotScript>().ShakeAnim());
+                            }
+                        }
+                        return;
+                    }
+                }
             }
             else if (block.tag != "Slot")
             {
@@ -622,6 +645,15 @@ public class SceneLogic : MonoBehaviour
         foreach (Transform person in crowd.transform)
         {
             StartCoroutine(person.gameObject.GetComponent<PersonScript>().Jump());
+        }
+    }
+    IEnumerator StartCountdown()
+    {
+        yield return new WaitForSeconds(4);
+        while(timebar.sizeDelta.x > 0)
+        {
+            timebar.sizeDelta = new Vector2(4 * Time.deltaTime, 0);
+            yield return new WaitForEndOfFrame();
         }
     }
 }

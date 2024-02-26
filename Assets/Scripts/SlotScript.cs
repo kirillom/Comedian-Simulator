@@ -113,4 +113,15 @@ public class SlotScript : MonoBehaviour
         transform.GetChild(0).GetComponent<RawImage>().uvRect = new Rect(0,0, (width - 85) / 25, 1);
         transform.GetChild(2).GetComponent<RectTransform>().anchoredPosition = new Vector2(width, 0);
     }
+
+    public IEnumerator ShakeAnim()
+    {
+        for(int i = 0; i < 3; i++)
+        {
+            transform.position = new Vector3(transform.position.x+10, transform.position.y, 0);
+            yield return new WaitForSeconds(0.05f);
+            transform.position = new Vector3(transform.position.x-10, transform.position.y, 0);
+            yield return new WaitForSeconds(0.05f);
+        }
+    }
 }

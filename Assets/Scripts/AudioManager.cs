@@ -28,8 +28,9 @@ public class AudioManager : MonoBehaviour
         audioSource.PlayOneShot(Resources.Load<AudioClip>("Sounds/" + sound), volume);
     }
 
-    public void CrowdSpeaking()
+    public IEnumerator CrowdSpeaking()
     {
+        yield return new WaitForSeconds(1);
         audioSource.volume = 1;
         audioSource.Play();
     }
@@ -37,7 +38,7 @@ public class AudioManager : MonoBehaviour
     {
         while(audioSource.volume > 0)
         {
-            audioSource.volume -= 0.01f;
+            audioSource.volume -= 0.02f;
             yield return new WaitForEndOfFrame();
         }
         audioSource.Stop();
