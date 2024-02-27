@@ -97,4 +97,8 @@ public class InterfaceScript : MonoBehaviour
     {
         animator.SetBool("ReadyButtonHovered", false);
     }
+    public void TimeRanOut()
+    {
+        sceneLogic.TimeRanOut();
+    }
 }

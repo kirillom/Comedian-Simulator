@@ -194,7 +194,7 @@ public class SceneLogic : MonoBehaviour
             "smart", "poor", "boring"
         },
     };
-    private string[] jokes = { "Knock-knock! Who is there? It's me, /oa /n !", "What do you call a /a /n ? A /oa /n !", "Why do I like to /v ? Because it makes me /a !", "What is the best /n ? A /a /n !", "How to /v properly? I don't know, you better ask /oa /n !", "What did the /oa /n say to the /oa /n ? \"Hey, you should /v !\"", "Why doesn't the /oa /n like to /v ? They just think they're too /a for that!", "How to make a /oa /n /v ? Just bet they won't do it.", "One time I yelled \"Let's /v !\" in public and a /oa /n beat me up.", "Yesterday I met a /oa /n and I couldn't stop thinking about them since. Could anybody share some dating advices?", "If only you knew how hard it is to live with a /oa /n ! They are always trying to /v !", "My job may be hard but it always warms my heart to know there's a /oa /n waiting for me at home." };
+    private string[] jokes = { "Knock-knock! Who is there? It's me, /oa /n !", "What do you call a /a /n ? A /oa /n !", "Why do I like to /v ? Because it makes me /a !", "What is the best /n ? A /a /n !", "How to /v properly? I don't know, you better ask /oa /n !", "What did the /oa /n say to the /oa /n ? \"Hey, you should /v !\"", "Why doesn't the /oa /n like to /v ? They just think they're too /a for that!", "How to make a /oa /n /v ? Just /v .", "One time I yelled \"Let's /v !\" in public and a /oa /n beat me up.", "Yesterday I met a /oa /n and I couldn't stop thinking about them since. Could anybody share some dating advices?", "If only you knew how hard it is to live with a /oa /n ! They are always trying to /v !", "My job may be hard but it always warms my heart to know there's a /oa /n waiting for me at home.", "How /a do you have to be to work at this job?" };
     public AudioManager audioManager;
     public Animator cameraAnimator;
     public string finishedJoke;
@@ -242,7 +242,6 @@ public class SceneLogic : MonoBehaviour
         InstantiateBlockSlots(adjectiveWordsContainer, ref adjectiveWordBlocks, CreateWordPool(adjectiveWords, audience), adjectiveBlockPrefab, 3);
 
         StartCoroutine(audioManager.CrowdSpeaking());
-        StartCoroutine(StartCountdown());
     }
 
     public string[] CreateWordPool(Dictionary<string, string[]> wordsDictionary, string audience)
@@ -470,7 +469,6 @@ public class SceneLogic : MonoBehaviour
 
     public void FinishJoke()
     {
-        timebar.sizeDelta = timebar.sizeDelta;
         finishedJoke = "";
         int blocksCount = 0;
         foreach (GameObject block in jokeBlocks)
@@ -647,13 +645,15 @@ public class SceneLogic : MonoBehaviour
             StartCoroutine(person.gameObject.GetComponent<PersonScript>().Jump());
         }
     }
-    IEnumerator StartCountdown()
+    public void TimeRanOut()
     {
-        yield return new WaitForSeconds(4);
-        while(timebar.sizeDelta.x > 0)
-        {
-            timebar.sizeDelta = new Vector2(4 * Time.deltaTime, 0);
-            yield return new WaitForEndOfFrame();
-        }
+        StartCoroutine(audioManager.CrowdStop());
+        interfaceAnimator.SetBool("ActivePanel", false);
+        StartCoroutine(Purge());
+        jokeBlocks.Clear();
+        nounWordBlocks.Clear();
+        verbWordBlocks.Clear();
+        adjectiveWordBlocks.Clear();
+        Debug.Log("the comedian is dead");
     }
 }
