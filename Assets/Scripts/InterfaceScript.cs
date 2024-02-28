@@ -99,6 +99,6 @@ public class InterfaceScript : MonoBehaviour
     }
     public void TimeRanOut()
     {
-        sceneLogic.TimeRanOut();
+        StartCoroutine(sceneLogic.TimeRanOut());
     }
 }

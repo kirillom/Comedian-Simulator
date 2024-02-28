@@ -33,8 +33,11 @@ public class SceneLogic : MonoBehaviour
     public GameObject adjectiveBlockPrefab;
     public GameObject blockOriginPrefab;
     public GameObject crowd;
-    public RectTransform timebar;
     public TMP_Text monologueBoxText;
+    public Text gameOverText;
+    public Text cringeJoke;
+    public Animator comedianAnimator;
+    public Animator gameOverAnimator;
     public Animator wordsPanelAnimator;
     public Animator interfaceAnimator;
     public JokePanelScript jokePanelScript;
@@ -45,7 +48,7 @@ public class SceneLogic : MonoBehaviour
     {
         ["General"] = new string[]
         {
-            "girl", "boy", "god", "woman", "man", "human"
+            "girl", "boy", "god", "woman", "man", "human", "lovecraftian horror beyond comprehension"
         },
         ["Teenagers"] = new string[]
         {
@@ -53,11 +56,11 @@ public class SceneLogic : MonoBehaviour
         },
         ["Parents"] = new string[]
         {
-            "child", "son", "daughter", "husband", "wife"
+            "son", "daughter", "husband", "wife"
         },
         ["Children"] = new string[]
         {
-            "mommy", "daddy", "dinosaur", "baby", "child", "best friend"
+            "mommy", "daddy", "dinosaur", "baby", "best friend"
         },
         ["Pet lovers"] = new string[]
         {
@@ -69,11 +72,11 @@ public class SceneLogic : MonoBehaviour
         },
         ["Programmers"] = new string[]
         {
-            "Elon Mask", "programmer", "project lead", "boss", "junior guy"
+            "Elon Mask", "programmer", "boss", "junior guy"
         },
         ["Gym bros"] = new string[]
         {
-            "gym bro", "sis", "man", "bro"
+            "gym bro", "man", "bro", "bodybuilder"
         },
         ["Gamers"] = new string[]
         {
@@ -81,7 +84,7 @@ public class SceneLogic : MonoBehaviour
         },
         ["Foodies"] = new string[]
         {
-            "chicken nugget", "pizza", "fish", "chicken"
+            "chicken nugget", "pizza", "fish", "chicken", "pig"
         },
         ["Artists"] = new string[]
         {
@@ -89,7 +92,7 @@ public class SceneLogic : MonoBehaviour
         },
         ["Students"] = new string[]
         {
-            "teacher", "professor", "scientist", "nerd", "principal"
+            "professor", "scientist", "nerd", "principal"
         },
     };
     Dictionary<string, string[]> verbWords = new Dictionary<string, string[]>
@@ -116,7 +119,7 @@ public class SceneLogic : MonoBehaviour
         },
         ["Conservationists"] = new string[]
         {
-            "protest", "meditate", "photosynthesize", "hibernate"
+            "protest against the government", "meditate", "photosynthesize", "hibernate"
         },
         ["Programmers"] = new string[]
         {
@@ -155,11 +158,11 @@ public class SceneLogic : MonoBehaviour
         },
         ["Parents"] = new string[]
         {
-            "loving", "caring", "wise", "calm"
+            "overprotective", "wise", "anxious", "sleep-deprived"
         },
         ["Children"] = new string[]
         {
-            "cute", "pink", "small", "playful"
+            "cute", "pink", "small", "playful", "stupid", "angry"
         },
         ["Pet lovers"] = new string[]
         {
@@ -171,7 +174,7 @@ public class SceneLogic : MonoBehaviour
         },
         ["Programmers"] = new string[]
         {
-            "smart", "exhausted"
+            "smart", "exhausted", "minimum wage", "sleep-deprived"
         },
         ["Gym bros"] = new string[]
         {
@@ -179,7 +182,7 @@ public class SceneLogic : MonoBehaviour
         },
         ["Gamers"] = new string[]
         {
-            "nerdy", "skilled", "top"
+            "skilled", "better than you", "angry"
         },
         ["Foodies"] = new string[]
         {
@@ -191,10 +194,10 @@ public class SceneLogic : MonoBehaviour
         },
         ["Students"] = new string[]
         {
-            "smart", "poor", "boring"
+            "smart", "poor", "boring", "stupid"
         },
     };
-    private string[] jokes = { "Knock-knock! Who is there? It's me, /oa /n !", "What do you call a /a /n ? A /oa /n !", "Why do I like to /v ? Because it makes me /a !", "What is the best /n ? A /a /n !", "How to /v properly? I don't know, you better ask /oa /n !", "What did the /oa /n say to the /oa /n ? \"Hey, you should /v !\"", "Why doesn't the /oa /n like to /v ? They just think they're too /a for that!", "How to make a /oa /n /v ? Just /v .", "One time I yelled \"Let's /v !\" in public and a /oa /n beat me up.", "Yesterday I met a /oa /n and I couldn't stop thinking about them since. Could anybody share some dating advices?", "If only you knew how hard it is to live with a /oa /n ! They are always trying to /v !", "My job may be hard but it always warms my heart to know there's a /oa /n waiting for me at home.", "How /a do you have to be to work at this job?" };
+    private string[] jokes = { "Knock-knock! Who is there? It's me, /oa /n !", "What do you call a /a /n ? A /oa /n !", "Why do I like to /v ? Because it makes me /a !", "What is the best /n ? A /a /n !", "How to /v properly? I don't know, you better ask /oa /n !", "What did the /oa /n say to the /oa /n ? \"Hey, you should /v !\"", "Why doesn't the /oa /n like to /v ? They just think they're too /a for that!", "How to make a /oa /n /v ? Just /v .", "One time I yelled \"Let's /v !\" in public and a /oa /n beat me up.", "Yesterday I met a /oa /n and I couldn't stop thinking about them since. Could anybody share some dating advices?", "If only you knew how hard it is to live with a /oa /n ! They are always trying to /v !", "My job may be hard but it always warms my heart to know there's a /oa /n waiting for me at home.", "How /a do you have to be to work at this job?! Just being here makes me /a !" };
     public AudioManager audioManager;
     public Animator cameraAnimator;
     public string finishedJoke;
@@ -214,7 +217,7 @@ public class SceneLogic : MonoBehaviour
         Application.targetFrameRate = fps;
         if(Input.GetKeyDown(KeyCode.R))
         {
-            
+            StartCoroutine(TimeRanOut());
         }
     }
 
@@ -645,7 +648,7 @@ public class SceneLogic : MonoBehaviour
             StartCoroutine(person.gameObject.GetComponent<PersonScript>().Jump());
         }
     }
-    public void TimeRanOut()
+    public IEnumerator TimeRanOut()
     {
         StartCoroutine(audioManager.CrowdStop());
         interfaceAnimator.SetBool("ActivePanel", false);
@@ -654,6 +657,65 @@ public class SceneLogic : MonoBehaviour
         nounWordBlocks.Clear();
         verbWordBlocks.Clear();
         adjectiveWordBlocks.Clear();
-        Debug.Log("the comedian is dead");
+        cameraAnimator.SetBool("IsZoomed", false);
+        yield return new WaitForSeconds(2);
+        StartCoroutine(Death());
+    }
+    public IEnumerator Death()
+    {
+        int random = Random.Range(1, 3);
+        switch (random)
+        {
+            case 1:
+                gameOverText.text = "YOU'RE BAD";
+                break;
+            case 2:
+                gameOverText.text = "GET GOOD";
+                break;
+            case 3:
+                gameOverText.text = "COMEDY IS DEAD";
+                break;
+        }
+        random = Random.Range(1, 7);
+        switch (random)
+        {
+            case 1:
+                cringeJoke.text = "\"Why did the golfer change his pants?\r\nBecause he got a hole in one!\"";
+                break;
+            case 2:
+                cringeJoke.text = "\"I bought a ceiling fan the other day.\r\nComplete waste of money. He just stands there applauding and saying \"Ooh, I love how smooth it is.\"";
+                break;
+            case 3:
+                cringeJoke.text = "\"What do you call a can opener that doesn’t work?\r\nA can’t opener!\"";
+                break;
+            case 4:
+                cringeJoke.text = "\"Why did the scarecrow win an award?\r\nHe was outstanding in his field.\"";
+                break;
+            case 5:
+                cringeJoke.text = "\"Ever tried to eat a clock?\r\nIt’s time-consuming.\"";
+                break;
+            case 6:
+                cringeJoke.text = "\"Why are cats bad storytellers?\r\nBecause they only have one tale.\"";
+                break;
+            case 7:
+                cringeJoke.text = "\"Two cannibals are eating a clown.\r\nOne says to the other: “Does this taste funny to you?”\"";
+                break;
+        }
+        yield return new WaitForSeconds(2);
+        random = Random.Range(1, 3);
+        switch (random)
+        {
+            case 1:
+                comedianAnimator.SetTrigger("Death1");
+                break;
+            case 2:
+                comedianAnimator.SetTrigger("Death2");
+                break;
+            case 3:
+                comedianAnimator.SetTrigger("Death3");
+                break;
+        }
+        yield return new WaitForSeconds(2);
+        gameOverAnimator.SetBool("GameOver", true);
     }
 }
