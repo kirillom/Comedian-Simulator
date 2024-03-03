@@ -7,7 +7,8 @@ using UnityEngine.UI;
 public class JokePanelScript : MonoBehaviour
 {
     public float height;
-    public GameObject readyButton;
+    public RectTransform readyButton;
+    public RectTransform blocksContainer;
     public float readyButtonY;
     public Sprite frame1;
     public Sprite frame2;
@@ -24,7 +25,8 @@ public class JokePanelScript : MonoBehaviour
         if (GetComponent<RectTransform>().anchoredPosition.y != height)
         {
             GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(GetComponent<RectTransform>().anchoredPosition, new Vector2(0, height), 0.2f);
-            readyButton.GetComponent<RectTransform>().anchoredPosition = Vector2.Lerp(readyButton.GetComponent<RectTransform>().anchoredPosition, new Vector2(0, height + 60), 0.2f);
+            readyButton.anchoredPosition = Vector2.Lerp(readyButton.anchoredPosition, new Vector2(0, height + 60), 0.2f);
+            blocksContainer.anchoredPosition = Vector2.Lerp(blocksContainer.anchoredPosition, new Vector2(0, height), 0.2f);
         }
     }
     void Flip()

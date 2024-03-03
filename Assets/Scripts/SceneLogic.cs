@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
+using UnityEngine.Rendering.PostProcessing;
 //using static System.Net.Mime.MediaTypeNames;
 
 public class SceneLogic : MonoBehaviour
@@ -22,6 +25,7 @@ public class SceneLogic : MonoBehaviour
     public GameObject jokePanel;
     public GameObject blockPanel;
     public GameObject mainInterface;
+    public GameObject gameOverScreen;
     public GameObject nounWordsContainer;
     public GameObject verbWordsContainer;
     public GameObject adjectiveWordsContainer;
@@ -36,13 +40,17 @@ public class SceneLogic : MonoBehaviour
     public TMP_Text monologueBoxText;
     public Text gameOverText;
     public Text cringeJoke;
+    public Text scoreText;
     public Animator comedianAnimator;
     public Animator gameOverAnimator;
     public Animator wordsPanelAnimator;
     public Animator interfaceAnimator;
     public JokePanelScript jokePanelScript;
     string audience;
-    public float score;
+    public float jokeScore;
+    private int presentScore = 0;
+    public int score = 0;
+    public bool isLastTry = false;
     private string[] audiences = { "Teenagers", "Parents", "Children", "Pet lovers", "Conservationists", "Programmers", "Gym bros", "Gamers", "Foodies", "Artists", "Students", "General" };
     Dictionary<string, string[]> nounWords = new Dictionary<string, string[]>
     {
@@ -52,27 +60,27 @@ public class SceneLogic : MonoBehaviour
         },
         ["Teenagers"] = new string[]
         {
-            "teenager", "best friend", "first love", "chick"
+            "teenager", "best friend", "first love", "chick", "idiot"
         },
         ["Parents"] = new string[]
         {
-            "son", "daughter", "husband", "wife"
+            "husband", "wife", "mommy", "daddy", "baby"
         },
         ["Children"] = new string[]
         {
-            "mommy", "daddy", "dinosaur", "baby", "best friend"
+            "mommy", "daddy", "dinosaur", "baby", "best friend", "teddy bear"
         },
         ["Pet lovers"] = new string[]
         {
-            "cat", "dog", "parrot", "hamster", "horse"
+            "cat", "dog", "hamster", "horse"
         },
         ["Conservationists"] = new string[]
         {
-            "trash bin", "environmental activist", "vegeterian"
+            "environmental activist", "vegeterian", "protester"
         },
         ["Programmers"] = new string[]
         {
-            "Elon Mask", "programmer", "boss", "junior guy"
+            "Elon Mask", "programmer", "boss", "gamedev", "software engineer"
         },
         ["Gym bros"] = new string[]
         {
@@ -80,19 +88,19 @@ public class SceneLogic : MonoBehaviour
         },
         ["Gamers"] = new string[]
         {
-            "gamer", "Mario", "Dota 2", "discord mod", "tryharder", "noob"
+            "gamer", "Mario", "noob", "discord mod", "gamedev", "streamer"
         },
         ["Foodies"] = new string[]
         {
-            "chicken nugget", "pizza", "fish", "chicken", "pig"
+            "chicken nugget", "pizza", "chicken", "pig"
         },
         ["Artists"] = new string[]
         {
-            "artist", "van Gogh", "god"
+            "artist", "god", "cartoonist"
         },
         ["Students"] = new string[]
         {
-            "professor", "scientist", "nerd", "principal"
+            "professor", "nerd", "principal"
         },
     };
     Dictionary<string, string[]> verbWords = new Dictionary<string, string[]>
@@ -123,7 +131,7 @@ public class SceneLogic : MonoBehaviour
         },
         ["Programmers"] = new string[]
         {
-            "work 24/7", "chill with friends", "hack pentagon", "go on a vacation", "drink too much coffee"
+            "hack pentagon", "go on a vacation", "drink too much coffee", "fix someone else's mistakes"
         },
         ["Gym bros"] = new string[]
         {
@@ -135,11 +143,11 @@ public class SceneLogic : MonoBehaviour
         },
         ["Foodies"] = new string[]
         {
-            "eat too much", "cook pasta"
+            "eat too much", "cook pasta", ""
         },
         ["Artists"] = new string[]
         {
-            "go to museum", "create a masterpiece", "have weird dreams"
+            "create a masterpiece", "have weird dreams"
         },
         ["Students"] = new string[]
         {
@@ -197,33 +205,72 @@ public class SceneLogic : MonoBehaviour
             "smart", "poor", "boring", "stupid"
         },
     };
-    private string[] jokes = { "Knock-knock! Who is there? It's me, /oa /n !", "What do you call a /a /n ? A /oa /n !", "Why do I like to /v ? Because it makes me /a !", "What is the best /n ? A /a /n !", "How to /v properly? I don't know, you better ask /oa /n !", "What did the /oa /n say to the /oa /n ? \"Hey, you should /v !\"", "Why doesn't the /oa /n like to /v ? They just think they're too /a for that!", "How to make a /oa /n /v ? Just /v .", "One time I yelled \"Let's /v !\" in public and a /oa /n beat me up.", "Yesterday I met a /oa /n and I couldn't stop thinking about them since. Could anybody share some dating advices?", "If only you knew how hard it is to live with a /oa /n ! They are always trying to /v !", "My job may be hard but it always warms my heart to know there's a /oa /n waiting for me at home.", "How /a do you have to be to work at this job?! Just being here makes me /a !" };
+    private string[] jokes = { "Knock-knock! Who is there? It's me, /oa /n !", "What do you call a /a /n ? A /oa /n !", "Why do I like to /v ? Because it makes me /a !", "What is the best /n ? A /a /n !", "How to /v properly? I don't know, you better ask /oa /n !", "What did the /oa /n say to the /oa /n ? \"Hey, you should /v !\"", "Why doesn't the /oa /n like to /v ? They just think they're too /a for that!", "How to make a /oa /n /v ? Just /v .", "One time I yelled \"Let's /v !\" in public and a /oa /n beat me up.", "If only you knew how hard it is to live with a /oa /n ! They are always trying to /v !", "Life can be hard at times, but it always warms my heart to know there's a /oa /n waiting for me at home.", "How /a do you have to be to work at this job? Just being here makes me /a !", "The other day I saw a /oa /n eating a /oa /n . Man, people are wild these days!", "What to do to make a /oa /n fall in love with you? /v !", "Lately I was having a talk with a /oa /n and I mentioned how I love to /v , but they said it's gross. Am I wrong here?", "Remember lads, never try to /v with a /oa /n . Last time I tried it was a disaster!", "Whenever I try to talk to any /oa /n they always start to /v . What's wrong with me?" };
+    //private string[] jokes = { "So I'm grabbing my daily /n at a McDonald's, right, when this /a /n comes straight to me and just starts to /v . LOL too bad they were so /a they couldn't actually /v but hey when they were done I'm just like \"Hey dude you wanna have this /oa /n ?\" And they were like \"Nah man I better go and /v\" but there ain't no way this kid did me like that so I just basically pull out my /a /n and start throwing it at everyone around, yeah. So yeah this is basically how I ended up in jail." };
     public AudioManager audioManager;
     public Animator cameraAnimator;
     public string finishedJoke;
     public TMP_Text auditoryText;
-    //public const Dictionary<string, string[]> themedNouns;
-
     public bool isDraggingBlock = false;
     // Start is called before the first frame update
     void Start()
     {
-        InitializeJoke();
+        StartCoroutine(Beginning());
     }
 
     // Update is called once per frame
     void Update()
     {
         Application.targetFrameRate = fps;
-        if(Input.GetKeyDown(KeyCode.R))
+    }
+
+    public IEnumerator Beginning()
+    {
+        cameraAnimator.SetTrigger("Start");
+        audioManager.PlaySound("prelude");
+        yield return new WaitForSeconds(3);
+        StartCoroutine(audioManager.CrowdStop());
+        yield return new WaitForSeconds(1);
+        interfaceAnimator.SetBool("MonologueBoxOpen", true);
+        yield return new WaitForSeconds(0.5f);
+        int i = 0;
+        string result = "";
+        int soundIterator = 0;
+        string joke = "Comedy night starts...\0 Now!";
+        while (i < joke.Length)
         {
-            StartCoroutine(TimeRanOut());
+            if (joke[i] == '\0')
+            {
+                i++;
+                yield return new WaitForSeconds(1);
+            }
+            else
+            {
+                result += joke[i];
+                i++;
+            }
+            if (soundIterator == 0)
+            {
+                audioManager.PlaySound("speech", 0.2f);
+                audioManager.audioSource.pitch = Random.Range(0.5f, 0.8f);
+            }
+            soundIterator++;
+            if (soundIterator > 2) soundIterator = 0;
+
+            monologueBoxText.text = result;
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
         }
+        audioManager.audioSource.pitch = 1;
+        yield return new WaitForSeconds(2f);
+        interfaceAnimator.SetBool("MonologueBoxOpen", false);
+        InitializeJoke();
     }
 
     public void InitializeJoke()
     {
-        score = 0;
+        if (isLastTry) interfaceAnimator.SetTrigger("Warning");
+        jokeScore = 0;
         audience = audiences[Random.Range(0, audiences.Length - 1)];
         auditoryText.text = audience;
         cameraAnimator.SetBool("IsZoomed", true);
@@ -244,7 +291,7 @@ public class SceneLogic : MonoBehaviour
         InstantiateBlockSlots(verbWordsContainer, ref verbWordBlocks, CreateWordPool(verbWords, audience), verbBlockPrefab, 2);
         InstantiateBlockSlots(adjectiveWordsContainer, ref adjectiveWordBlocks, CreateWordPool(adjectiveWords, audience), adjectiveBlockPrefab, 3);
 
-        StartCoroutine(audioManager.CrowdSpeaking());
+        StartCoroutine(audioManager.MusicDelayedStart());
     }
 
     public string[] CreateWordPool(Dictionary<string, string[]> wordsDictionary, string audience)
@@ -294,6 +341,7 @@ public class SceneLogic : MonoBehaviour
     public IEnumerator NewJoke(string joke)
     {
         yield return new WaitForSeconds(3);
+        audioManager.crowdSource.Play();
         mainInterface.GetComponent<InterfaceScript>().appearAnimPlaying = true;
         //string joke = "What did the \0 say to the \0 ? \0 !";
         //Why didn't the n v ? Because n didn't know how to v !
@@ -349,8 +397,6 @@ public class SceneLogic : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
         yield return new WaitForEndOfFrame();
-        bool hasLowered = false;
-        bool hasUppered = false;
         for (int i = 0; i < jokeBlocks.Count; i++)
         {
             GameObject block = jokeBlocks[i];
@@ -371,18 +417,15 @@ public class SceneLogic : MonoBehaviour
                 if (destination.x + block.GetComponent<SegmentScript>().dimensions.x > 830)
                 {
                     destination = new Vector2(-830, destination.y - 70);
-                    //block.GetComponent<SegmentScript>().destination = destination;
                 }
                 if (i == jokeBlocks.Count - 1)
                 {
                     if (destination.y < block.GetComponent<SegmentScript>().destination.y)
                     {
-                        hasUppered = true;
                         jokePanelScript.height += 70;
                     }
                     else if (destination.y > block.GetComponent<SegmentScript>().destination.y)
                     {
-                        hasLowered = true;
                         jokePanelScript.height -= 70;
                     }
                 }
@@ -391,40 +434,15 @@ public class SceneLogic : MonoBehaviour
 
                 if (block.GetComponent<SlotScript>() != null && block.GetComponent<SlotScript>().attachedBlock != null)
                 {
-                    block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().destination = block.transform.TransformPoint(Vector3.zero) + (destination - block.transform.localPosition);
+                    block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().destination = destination;
                 }
             }
         }
-        if (hasLowered)
+        foreach (GameObject gameObject in jokeBlocks)
         {
-            foreach (GameObject gameObject in jokeBlocks)
+            if (gameObject.GetComponent<SlotScript>() != null && gameObject.GetComponent<SlotScript>().attachedBlock != null)
             {
-                if (gameObject.GetComponent<SlotScript>() != null && gameObject.GetComponent<SlotScript>().attachedBlock != null)
-                {
-                    gameObject.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().destination -= new Vector3(0, 70, 0);
-                    gameObject.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
-                }
-            }
-        }
-        else if (hasUppered)
-        {
-            foreach (GameObject gameObject in jokeBlocks)
-            {
-                if (gameObject.GetComponent<SlotScript>() != null && gameObject.GetComponent<SlotScript>().attachedBlock != null)
-                {
-                    gameObject.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().destination += new Vector3(0, 70, 0);
-                    gameObject.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
-                }
-            }
-        }
-        else
-        {
-            foreach (GameObject gameObject in jokeBlocks)
-            {
-                if (gameObject.GetComponent<SlotScript>() != null && gameObject.GetComponent<SlotScript>().attachedBlock != null)
-                {
-                    gameObject.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
-                }
+                gameObject.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().MoveToDestination();
             }
         }
     }
@@ -450,17 +468,17 @@ public class SceneLogic : MonoBehaviour
             GameObject origin = wordBlocks[i];
             if (i == 0)
             {
-                origin.transform.position = new Vector3(110, 280, 0);
+                origin.transform.localPosition = new Vector3(-850, 100, 0);
             }
             else
             {
                 GameObject previousOrigin = wordBlocks[i - 1];
 
-                origin.transform.position = new Vector3(previousOrigin.transform.position.x + previousOrigin.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x + 25, previousOrigin.transform.position.y, 0);
+                origin.transform.localPosition = new Vector3(previousOrigin.transform.localPosition.x + previousOrigin.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x + 25, previousOrigin.transform.localPosition.y, 0);
 
-                if (origin.transform.position.x + origin.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x > 1700)
+                if (origin.transform.localPosition.x + origin.transform.GetChild(0).GetComponent<RectTransform>().sizeDelta.x > 820)
                 {
-                    origin.transform.position = new Vector3(110, origin.transform.position.y - 80);
+                    origin.transform.localPosition = new Vector3(-850, origin.transform.localPosition.y - 80);
                 }
             }
             GameObject block = Instantiate(blockPrefab, origin.transform.position, new Quaternion(0, 0, 0, 0), container.transform);
@@ -482,7 +500,7 @@ public class SceneLogic : MonoBehaviour
                 {
                     finishedJoke += block.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().text + " ";
                     block.GetComponent<SlotScript>().attachedBlock.GetComponent<BlockScript>().isMoving = false;
-                    CalculateScore(block);
+                    CalculatejokeScore(block);
                     blocksCount++;
                 }
                 else
@@ -506,7 +524,7 @@ public class SceneLogic : MonoBehaviour
                 finishedJoke += block.GetComponent<TMP_Text>().text + " ";
             }
         }
-        score = score / blocksCount;
+        jokeScore = jokeScore / blocksCount;
 
         StartCoroutine(audioManager.CrowdStop());
         audioManager.PlaySound("done");
@@ -519,27 +537,27 @@ public class SceneLogic : MonoBehaviour
         verbWordBlocks.Clear();
         adjectiveWordBlocks.Clear();
     }
-    public void CalculateScore(GameObject block)
+    public void CalculatejokeScore(GameObject block)
     {
         if (block.GetComponent<SlotScript>().type == 1)
         {
             if (nounWords[audience].Contains(block.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().text))
             {
-                score++;
+                jokeScore++;
             }
         }
         if (block.GetComponent<SlotScript>().type == 2)
         {
             if (verbWords[audience].Contains(block.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().text))
             {
-                score++;
+                jokeScore++;
             }
         }
         if (block.GetComponent<SlotScript>().type == 3)
         {
             if (adjectiveWords[audience].Contains(block.GetComponent<SlotScript>().attachedBlock.transform.GetChild(1).GetComponent<TMP_Text>().text))
             {
-                score++;
+                jokeScore++;
             }
         }
     }
@@ -614,39 +632,88 @@ public class SceneLogic : MonoBehaviour
         }
         audioManager.audioSource.pitch = 1;
         audioManager.PlaySound("badumts");
-        if (score >= 0.5f)
+        if (jokeScore > 0.5f)
         {
-            CrowdGoodReaction();
+            StartCoroutine(CrowdGoodReaction());
         }
-        else if (score > 0f)
+        else if (jokeScore > 0.34f)
         {
-            CrowdNeutralReaction();
+            StartCoroutine(CrowdNeutralReaction());
         }
-        else if (score == 0f)
+        else
         {
-            CrowdBadReaction();
+            StartCoroutine(CrowdBadReaction());
         }
-        
+    }
+
+    public IEnumerator CrowdBadReaction()
+    {
+        audioManager.PlaySound("crickets");
+        if (!isLastTry)
+        {
+            isLastTry = true;
+            yield return new WaitForSeconds(2f);
+            interfaceAnimator.SetBool("MonologueBoxOpen", false);
+            yield return new WaitForSeconds(2f);
+            interfaceAnimator.SetBool("IsLastTry", true);
+            InitializeJoke();
+        }
+        else
+        {
+            isLastTry = false;
+            interfaceAnimator.SetBool("IsLastTry", false);
+            yield return new WaitForSeconds(2f);
+            interfaceAnimator.SetBool("MonologueBoxOpen", false);
+            yield return new WaitForSeconds(1f);
+            StartCoroutine(Death());
+        }
+    }
+    public IEnumerator CrowdNeutralReaction()
+    {
+        isLastTry = false;
+        interfaceAnimator.SetBool("IsLastTry", false);
+        audioManager.PlaySound("crowd_clapping");
+        score += Random.Range(100, 500);
+        StartCoroutine(UpdateScore());
+
         yield return new WaitForSeconds(2f);
         interfaceAnimator.SetBool("MonologueBoxOpen", false);
         InitializeJoke();
     }
-
-    public void CrowdBadReaction()
+    public IEnumerator CrowdGoodReaction()
     {
-
-    }
-    public void CrowdNeutralReaction()
-    {
-        audioManager.PlaySound("crowd_clapping");
-    }
-    public void CrowdGoodReaction()
-    {
+        isLastTry = false;
+        interfaceAnimator.SetBool("IsLastTry", false);
         audioManager.PlaySound("crowd_laughing");
         foreach (Transform person in crowd.transform)
         {
             StartCoroutine(person.gameObject.GetComponent<PersonScript>().Jump());
         }
+        score += Random.Range(500,1000);
+        StartCoroutine(UpdateScore());
+
+        yield return new WaitForSeconds(2f);
+        interfaceAnimator.SetBool("MonologueBoxOpen", false);
+        InitializeJoke();
+    }
+    public IEnumerator UpdateScore()
+    {
+        interfaceAnimator.SetBool("IsScoreVisible", true);
+        while(presentScore != score)
+        {
+            if(score == 0)
+            {
+                presentScore = Math.Clamp(presentScore - 7, 0, 999999999);
+            }
+            else
+            {
+                presentScore = Math.Clamp(presentScore + 7, 0, score);
+            }
+            scoreText.text = "Earnings: " + Convert.ToString(presentScore) + "$";
+            yield return new WaitForEndOfFrame();
+        }
+        yield return new WaitForSeconds(2);
+        interfaceAnimator.SetBool("IsScoreVisible", false);
     }
     public IEnumerator TimeRanOut()
     {
@@ -663,7 +730,9 @@ public class SceneLogic : MonoBehaviour
     }
     public IEnumerator Death()
     {
-        int random = Random.Range(1, 3);
+        isLastTry = false;
+        interfaceAnimator.SetBool("IsLastTry", false);
+        int random = Random.Range(1, 4);
         switch (random)
         {
             case 1:
@@ -676,7 +745,7 @@ public class SceneLogic : MonoBehaviour
                 gameOverText.text = "COMEDY IS DEAD";
                 break;
         }
-        random = Random.Range(1, 7);
+        random = Random.Range(1, 8);
         switch (random)
         {
             case 1:
@@ -698,11 +767,16 @@ public class SceneLogic : MonoBehaviour
                 cringeJoke.text = "\"Why are cats bad storytellers?\r\nBecause they only have one tale.\"";
                 break;
             case 7:
-                cringeJoke.text = "\"Two cannibals are eating a clown.\r\nOne says to the other: “Does this taste funny to you?”\"";
+                cringeJoke.text = "\"Two cannibals are eating a clown.\r\nOne says to the other: \"Does this taste funny to you?\"";
                 break;
         }
-        yield return new WaitForSeconds(2);
-        random = Random.Range(1, 3);
+        yield return new WaitForSeconds(1);
+        if(score != 0)
+        {
+            score = 0;
+            StartCoroutine(UpdateScore());
+        }
+        random = Random.Range(1, 4);
         switch (random)
         {
             case 1:
@@ -716,6 +790,23 @@ public class SceneLogic : MonoBehaviour
                 break;
         }
         yield return new WaitForSeconds(2);
+        gameOverScreen.SetActive(true);
         gameOverAnimator.SetBool("GameOver", true);
+        audioManager.PlaySound("death");
+    }
+    public void Revive()
+    {
+        audioManager.PlaySound("resurrection");
+        StartCoroutine(Revive(true));
+    }
+    public IEnumerator Revive(bool a)
+    {
+        yield return new WaitForSeconds(3);
+        gameOverScreen.SetActive(false);
+        comedianAnimator.SetTrigger("Revive");
+        yield return new WaitForSeconds(2);
+        audioManager.PlaySound("ahem");
+        yield return new WaitForSeconds(1);
+        InitializeJoke();
     }
 }

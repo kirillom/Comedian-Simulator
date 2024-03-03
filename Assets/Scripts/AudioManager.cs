@@ -6,8 +6,8 @@ using UnityEngine.UIElements.Experimental;
 public class AudioManager : MonoBehaviour
 {
     public AudioSource audioSource;
-    public AudioClip blockIn;
-    public AudioClip blockOut;
+    public AudioSource musicSource;
+    public AudioSource crowdSource;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,20 +28,22 @@ public class AudioManager : MonoBehaviour
         audioSource.PlayOneShot(Resources.Load<AudioClip>("Sounds/" + sound), volume);
     }
 
-    public IEnumerator CrowdSpeaking()
+    public IEnumerator MusicDelayedStart()
     {
         yield return new WaitForSeconds(1);
-        audioSource.volume = 1;
-        audioSource.Play();
+        musicSource.Play();
     }
     public IEnumerator CrowdStop()
     {
-        while(audioSource.volume > 0)
+        while(crowdSource.volume > 0)
         {
-            audioSource.volume -= 0.02f;
+            crowdSource.volume -= 0.01f;
+            if(musicSource.volume > 0) musicSource.volume -= 0.02f;
             yield return new WaitForEndOfFrame();
         }
-        audioSource.Stop();
-        audioSource.volume = 1;
+        crowdSource.Stop();
+        musicSource.Stop();
+        crowdSource.volume = 1;
+        musicSource.volume = 1;
     }
 }

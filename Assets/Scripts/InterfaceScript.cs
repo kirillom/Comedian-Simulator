@@ -42,7 +42,7 @@ public class InterfaceScript : MonoBehaviour
                 if(block.GetComponent<BlockScript>().isMoving)
                 {
                     block.GetComponent<BlockScript>().isMoving = false;
-                    block.transform.position = block.GetComponent<BlockScript>().destination;
+                    block.transform.localPosition = block.GetComponent<BlockScript>().destination;
                 }
             }
             animator.SetInteger("ActivePool", currentPool);

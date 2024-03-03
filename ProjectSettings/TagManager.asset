@@ -7,11 +7,12 @@ TagManager:
   - Scene Logic
   - Slot
   - Block
+  - No Light
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - No Light
   - Water
   - UI
   - Post-Processing

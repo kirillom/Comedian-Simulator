@@ -43,7 +43,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         animator.SetTrigger("Appear");
         animator.SetBool("Hovering", false);
-        origin = destination = transform.position;
+        origin = destination = transform.localPosition;
     }
 
     public void Initialize(string text, GameObject container, GameObject jokePanel, GameObject mainInterface, SceneLogic sceneLogic, GameObject baseSlot, int type)
@@ -91,7 +91,6 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     void Update()
     {
         globalPosition = transform.position;
-
         if (isMouseOver)
         {
             if(Input.GetKeyDown(KeyCode.Mouse0))
@@ -110,7 +109,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         {
             if (Input.GetKeyUp(KeyCode.Mouse0))
             {
-                if (Input.mousePosition.y < 350 && attachedSlot != null)
+                if (Input.mousePosition.y < Screen.height / 3 && attachedSlot != null)
                 {
                     attachedSlot.GetComponent<SlotScript>().ResetSlot();
                     sceneLogic.audioManager.PlaySound("pop");
@@ -141,7 +140,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
                     if (collidedSlots.Count > 1)
                     {
-                        collidedSlots = collidedSlots.OrderBy(o => Vector3.Distance(transform.position, o.transform.position)).ToList();
+                        collidedSlots = collidedSlots.OrderBy(o => Vector3.Distance(transform.localPosition, o.transform.localPosition)).ToList();
                     }
 
                     if(collidedSlots.Count > 0)
@@ -169,7 +168,7 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
             }
             else blockDrag();
 
-            if(Input.mousePosition.y < 350)
+            if(Input.mousePosition.y < Screen.height / 3)
             {
                 sceneLogic.wordsPanelAnimator.SetBool("Hovering", true);
             }
@@ -182,11 +181,6 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         if(isMoving)
         {
             BlockMovement();
-        }
-
-        if(Input.GetKeyDown(KeyCode.C))
-        {
-            
         }
     }
 
@@ -238,23 +232,22 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     }
     private void blockDrag()
     {
-        //destination = Input.mousePosition;
         isMoving = false;
         transform.SetAsLastSibling();
-        transform.position = Vector3.Lerp(transform.position, new Vector3(Input.mousePosition.x - (width / 2), Input.mousePosition.y, 0), 0.2f);
+        transform.position = Vector3.Lerp(transform.position, new Vector3(Input.mousePosition.x - (width * (Screen.width / 1920f) / 2), Input.mousePosition.y, 0), 0.2f);
     }
 
     public void MoveToDestination()
     {
-        float angle = Mathf.Atan2(destination.y - transform.position.y, destination.x - transform.position.x);
-        distance = Vector3.Distance(transform.position, destination);
+        float angle = Mathf.Atan2(destination.y - transform.localPosition.y, destination.x - transform.localPosition.x);
+        distance = Vector3.Distance(transform.localPosition, destination);
         speed = distance / 300f;
         velocity = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle)) * distance / 30f;
         isMoving = true;
     }
     private void BlockMovement()
     {
-        float angle = Mathf.Atan2(destination.y - transform.position.y, destination.x - transform.position.x);
+        float angle = Mathf.Atan2(destination.y - transform.localPosition.y, destination.x - transform.localPosition.x);
         Vector3 velocityDelta = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0);
         
         if((Math.Sign(velocity.x) != Math.Sign(velocityDelta.x) || Math.Sign(velocity.y) != Math.Sign(velocityDelta.y)) && Math.Sign(velocity.x) != 0 && Math.Sign(velocity.y) != 0)
@@ -269,12 +262,12 @@ public class BlockScript : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
         velocity += velocityDelta;
 
-        transform.position += velocity;
+        transform.localPosition += velocity;
 
-        if(Vector3.Distance(transform.position, destination) < speed + 0.2f)
+        if(Vector3.Distance(transform.localPosition, destination) < speed + 0.2f)
         {
             origin = destination;
-            transform.position = origin;
+            transform.localPosition = origin;
             isMoving = false;
         }
     }
