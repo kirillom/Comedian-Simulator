@@ -53,6 +53,7 @@ public class SceneLogic : MonoBehaviour
     private int presentScore = 0;
     public int score = 0;
     public bool isLastTry = false;
+    public bool hasShownWarning = false;
     public List<GameObject> commentObjects;
     private string[] audiences = { "Teenagers", "Parents", "Children", "Pet lovers", "Conservationists", "Programmers", "Gym bros", "Gamers", "Foodies", "Students", "Content creators", "General" };
     Dictionary<string, string[]> nounWords = new Dictionary<string, string[]>
@@ -110,11 +111,11 @@ public class SceneLogic : MonoBehaviour
     {
         ["General"] = new string[]
         {
-            "die", "sin", "get into a car crash", "be gay", "do crimes", "collaborate with Chinese government"
+            "die", "sin", "get into a car crash", "be gay", "do crimes", "collaborate with Chinese government", "come back from dead"
         },
         ["Teenagers"] = new string[]
         {
-            "fall in love", "get depressed", "swear uncontrollably", "bully kids", "hang out", "fall into existential crisis", "get drunk", "rizz the skibidi baka in Ohio", "cry from loneliness"
+            "fall in love", "get depressed", "swear uncontrollably", "bully kids", "hang out", "fall into existential crisis", "get drunk", "rizz the skibidi baka in Ohio", "cry from loneliness", "ignore me"
         },
         ["Parents"] = new string[]
         {
@@ -142,7 +143,7 @@ public class SceneLogic : MonoBehaviour
         },
         ["Gamers"] = new string[]
         {
-            "go outside", "touch grass", "be on copium", "snipe people", "refuse to shower", "wish ill on others"
+            "go outside", "touch grass", "be on copium", "snipe people", "refuse to shower", "wish ill on others", "go on a killing spree"
         },
         ["Foodies"] = new string[]
         {
@@ -154,7 +155,7 @@ public class SceneLogic : MonoBehaviour
         },
         ["Content creators"] = new string[]
         {
-            "spread misinformation", "do tiktok dances"
+            "spread misinformation", "leak classified military documents", "gather fake internet points"
         },
     };
     Dictionary<string, string[]> adjectiveWords = new Dictionary<string, string[]>
@@ -189,7 +190,7 @@ public class SceneLogic : MonoBehaviour
         },
         ["Gym bros"] = new string[]
         {
-            "strong", "tough", "big", "muscular"
+            "strong", "tough", "big", "muscular", "masculine"
         },
         ["Gamers"] = new string[]
         {
@@ -208,7 +209,7 @@ public class SceneLogic : MonoBehaviour
             "world-famous", "charismatic", "goofy", "funny"
         },
     };
-    private string[] jokes = { "Knock-knock! Who is there? It's me, /oa /n !", "What do you call a /a /n ? A /oa /n !", "Why do I like to /v ? Because it makes me /a !", "What is the best /n ? A /a /n !", "How to /v properly? I don't know, you better ask /oa /n !", "What did the /oa /n say to the /oa /n ? \"Hey, you should /v !\"", "Why doesn't the /oa /n want to /v ? They just think they're too /a for that!", "How to make a /oa /n /v ? Just /v .", "One time I yelled \"Let's /v !\" in public and a /oa /n beat me up.", "If only you knew how hard it is to live with a /oa /n ! They are always trying to /v !", "Life can be hard at times, but it always warms my heart to know there's a /oa /n waiting for me at home.", "How /a do you have to be to work at this job? Just being here makes me /a !", "The other day I saw a /oa /n eating a /oa /n . Man, people are wild these days!", "What to do to make a /oa /n fall in love with you? /v !", "Lately I was having a talk with a /oa /n and I mentioned how I love to /v , but they said it's gross. Am I wrong here?", "Remember lads, never /v with a /oa /n . Last time I tried it was a disaster!", "Whenever I try to talk to any /oa /n they always start to /v . What's wrong with me?", "I asked a girl if she wanted to /v with me. She said I'm gross and should better find a /oa /n for myself.", "So this girl I like said I'm /a and /a . Is she into me bros?", "To /v and then /v - the best evening routine for me." };
+    private string[] jokes = { "Knock-knock! Who is there? It's me, /oa /n !", "What do you call a /a /n ? A /oa /n !", "What is the best /n ? A /a /n !", "How to /v properly? I don't know, you better ask /oa /n !", "What did the /oa /n say to the /oa /n ? \"Hey, you should /v !\"", "Why doesn't the /oa /n want to /v ? They just think they're too /a for that!", "How to make a /oa /n /v ? Just /v .", "One time I yelled \"Let's /v !\" in public and a /oa /n beat me up.", "If only you knew how hard it is to live with a /oa /n ! They are always trying to /v !", "Life can be hard at times, but it always warms my heart to know there's a /a /n waiting for me at home.", "How /a do you have to be to work at this job? Just being here makes me /a !", "The other day I saw a /oa /n eating a /oa /n . Man, people are wild these days!", "What to do to make a /oa /n fall in love with you? /v !", "Lately I was chatting with a /oa /n and I only mentioned how I love to /v , but they immediately blocked me.", "Remember lads, never /v with a /oa /n . Last time I tried it was a disaster!", "Whenever I try to talk to any /oa /n they always start to /v . What's wrong with me?", "I asked a girl if she wanted to /v with me. She said I'm gross and should better find a /oa /n for myself.", "So this girl I like said I'm /a and /a . Is she into me bros?", "To /v and then /v - the best evening routine for me.", "How many of a /oa /n does it take to change a lightbulb? None, they will go and /v instead.", "Yesterday I saw a /oa /n /v . I couldn't sleep since." };
     //private string[] jokes = { "So I'm grabbing my daily /n at a McDonald's, right, when this /a /n comes straight to me and just starts to /v . LOL too bad they were so /a they couldn't actually /v but hey when they were done I'm just like \"Hey dude you wanna have this /oa /n ?\" And they were like \"Nah man I better go and /v\" but there ain't no way this kid did me like that so I just basically pull out my /a /n and start throwing it at everyone around, yeah. So yeah this is basically how I ended up in jail." };
     public AudioManager audioManager;
     public Animator cameraAnimator;
@@ -273,7 +274,11 @@ public class SceneLogic : MonoBehaviour
 
     public void InitializeJoke()
     {
-        if (isLastTry) interfaceAnimator.SetTrigger("Warning");
+        if (isLastTry && !hasShownWarning)
+        {
+            interfaceAnimator.SetTrigger("Warning");
+            hasShownWarning = true;
+        }
         jokeScore = 0;
         audience = audiences[Random.Range(0, audiences.Length - 1)];
         auditoryText.text = audience;

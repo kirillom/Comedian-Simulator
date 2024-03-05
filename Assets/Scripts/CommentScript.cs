@@ -16,12 +16,34 @@ public class CommentScript : MonoBehaviour
         sceneLogic = GameObject.FindGameObjectWithTag("Scene Logic").GetComponent<SceneLogic>();
         commentObjects = new List<GameObject>(sceneLogic.commentObjects);
         commentObjects.Remove(gameObject);
-        StartCoroutine(DelayedStart());
+        bool isCollided = false;
+        do
+        {
+            //this was way overcomplicated
+            transform.localPosition = new Vector2(Random.Range(-750, 750), Random.Range(-450, 0));
+            float scale = 0.7f + Mathf.Abs(transform.localPosition.y) / 700;
+            transform.localScale = new Vector2(scale, scale);
+            foreach (GameObject comment in commentObjects)
+            {
+                if (Vector2.Distance(transform.localPosition, comment.transform.localPosition) < 300)
+                {
+                    isCollided = true;
+                    break;
+                }
+                else
+                {
+                    isCollided = false;
+                }
+            }
+        }
+        while (isCollided);
+        Invoke("Destroy", 6);
+        //StartCoroutine(DelayedStart());
     }
     IEnumerator DelayedStart()
     {
         bool isCollided = false;
-        yield return new WaitForEndOfFrame();
+        yield return null;
         do
         {
             //this was way overcomplicated
